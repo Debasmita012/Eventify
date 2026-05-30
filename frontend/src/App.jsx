@@ -1,122 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import Onboarding from './pages/Onboarding'
+import Feed from './pages/Feed'
+import EventDetail from './pages/EventDetail'
+import OrganizerPortal from './pages/OrganizerPortal'
+import Analytics from './pages/Analytics'
+import Portfolio from './pages/Portfolio'
+import Leaderboard from './pages/Leaderboard'
+import MapView from './pages/MapView'
+import Navbar from './components/Navbar'
 
-function App() {
-  const [count, setCount] = useState(0)
+function RequireAuth({ children }) {
+  const userId = localStorage.getItem('user_id')
+  return userId ? children : <Navigate to="/onboard" />
+}
 
+function Layout({ children }) {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      {children}
+    </div>
   )
 }
 
-export default App
+export default function App() {
+  const userId = localStorage.getItem('user_id')
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to={userId ? "/feed" : "/onboard"} />} />
+        <Route path="/onboard" element={<Onboarding />} />
+        <Route path="/feed" element={<RequireAuth><Layout><Feed /></Layout></RequireAuth>} />
+        <Route path="/event/:id" element={<RequireAuth><Layout><EventDetail /></Layout></RequireAuth>} />
+        <Route path="/organizer" element={<RequireAuth><Layout><OrganizerPortal /></Layout></RequireAuth>} />
+        <Route path="/analytics/:id" element={<RequireAuth><Layout><Analytics /></Layout></RequireAuth>} />
+        <Route path="/portfolio" element={<RequireAuth><Layout><Portfolio /></Layout></RequireAuth>} />
+        <Route path="/leaderboard" element={<RequireAuth><Layout><Leaderboard /></Layout></RequireAuth>} />
+        <Route path="/map" element={<RequireAuth><Layout><MapView /></Layout></RequireAuth>} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
