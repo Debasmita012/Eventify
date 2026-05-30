@@ -9,3 +9,5 @@ numpy
 pymongo[srv]
 
 bcrypt
+
+certifi

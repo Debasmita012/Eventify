@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API from '../config'
+import QRCode from 'react-qr-code'
 
 const CAT_COLORS = {
   tech: 'bg-blue-100 text-blue-700',
@@ -18,6 +19,7 @@ export default function EventCard({ event, isRsvpd = false, isBookmarked = false
   const [bookmarked, setBookmarked] = useState(isBookmarked)
   const [count, setCount] = useState(event.rsvp_count)
   const [loadRsvp, setLoadRsvp] = useState(false)
+  const [showQR, setShowQR] = useState(false)
   const navigate = useNavigate()
   const userId = localStorage.getItem('user_id')
   const trending = count > 100
@@ -130,13 +132,23 @@ export default function EventCard({ event, isRsvpd = false, isBookmarked = false
 
         {/* Actions */}
         <div className="flex gap-2">
-          <button onClick={handleRSVP} disabled={loadRsvp}
-            className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all
-              ${rsvpd
-                ? 'bg-green-500 text-white'
-                : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}>
-            {loadRsvp ? '...' : rsvpd ? '✓ Going' : 'RSVP'}
-          </button>
+          {rsvpd ? (
+            <>
+              <button onClick={handleRSVP} disabled={loadRsvp}
+                className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all bg-green-500 text-white">
+                {loadRsvp ? '...' : '✓ Booked'}
+              </button>
+              <button onClick={(e) => { e.stopPropagation(); setShowQR(true); }}
+                className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all bg-purple-600 text-white hover:bg-purple-700">
+                🎫 QR Code
+              </button>
+            </>
+          ) : (
+            <button onClick={handleRSVP} disabled={loadRsvp}
+              className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all bg-indigo-600 text-white hover:bg-indigo-700">
+              {loadRsvp ? '...' : 'RSVP'}
+            </button>
+          )}
           <button onClick={handleExport}
             className="px-3 py-2 rounded-xl border border-gray-200
               text-gray-500 text-xs hover:bg-gray-50 transition">
@@ -144,6 +156,22 @@ export default function EventCard({ event, isRsvpd = false, isBookmarked = false
           </button>
         </div>
       </div>
+
+      {/* QR Modal Overlay */}
+      {showQR && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={(e) => { e.stopPropagation(); setShowQR(false); }}>
+          <div className="bg-white p-6 rounded-2xl shadow-xl max-w-sm w-full text-center" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold mb-2">Event Ticket</h3>
+            <p className="text-gray-500 text-sm mb-6">Scan this code for entry to {event.title}</p>
+            <div className="bg-white p-4 inline-block rounded-xl shadow-inner border border-gray-100 mb-6">
+              <QRCode value={`eventify:user_${userId}:event_${event.id}`} size={200} />
+            </div>
+            <button onClick={() => setShowQR(false)} className="w-full bg-gray-900 text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition">
+              Close Ticket
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

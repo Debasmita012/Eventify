@@ -16,9 +16,10 @@ import GestureController from '../components/GestureController'
 
 
 const MOODS = [
-  { label: '🧠 Learn', tags: ['tech', 'career'] },
-  { label: '😎 Chill', tags: ['music', 'wellness', 'cultural'] },
-  { label: '🏆 Compete', tags: ['sports', 'gaming'] },
+  { label: '🧠 Big Brain', tags: ['tech', 'career'] },
+  { label: '😌 Stressed', tags: ['wellness'] },
+  { label: '🎸 Creative', tags: ['cultural', 'music'] },
+  { label: '🏃 Energetic', tags: ['sports', 'gaming'] },
 ]
 
 export default function Feed() {

@@ -1,6 +1,7 @@
 import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
+import certifi
 
 load_dotenv()
 
@@ -10,7 +11,7 @@ _db     = None
 def get_db():
     global _client, _db
     if _client is None:
-        _client = MongoClient(os.environ["MONGO_URL"])
+        _client = MongoClient(os.environ["MONGO_URL"], tlsCAFile=certifi.where())
         _db     = _client["eventify"]
     return _db
 
@@ -22,4 +23,4 @@ def init_db():
     db.events.create_index("id",   unique=True)
     db.rsvps.create_index([("user_id", 1), ("event_id", 1)], unique=True)
     db.bookmarks.create_index([("user_id", 1), ("event_id", 1)], unique=True)
-    print("✅ MongoDB connected and indexes ready")
+    print("MongoDB connected and indexes ready")
