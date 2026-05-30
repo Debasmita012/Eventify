@@ -54,7 +54,7 @@ def seed():
 
     # Insert events
     db.events.insert_many(events)
-    print(f"✅ Seeded {len(events)} events into MongoDB")
+    print(f"Seeded {len(events)} events into MongoDB")
 
 if __name__ == "__main__":
     seed()

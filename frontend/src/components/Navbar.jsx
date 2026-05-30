@@ -4,13 +4,20 @@ export default function Navbar() {
   const navigate = useNavigate()
   const loc = useLocation()
   const name = localStorage.getItem('user_name') || 'Student'
+  const role = localStorage.getItem('user_role') || 'student'
 
   const links = [
-    { path: '/feed', label: '🏠 Feed' },
-    { path: '/leaderboard', label: '🏆 Board' },
-    { path: '/portfolio', label: '📁 Portfolio' },
-    { path: '/organizer', label: '📋 Organizer' },
-    { path: '/map', label: '🗺 Map' },
+    { path: '/feed',         label: '🏠 Feed'     },
+    { path: '/dashboard',    label: '📊 Dashboard' },
+    { path: '/explore',      label: '🌐 Explore'  },
+    { path: '/leaderboard',  label: '🏆 Board'    },
+    { path: '/certificates', label: '🏅 Certs'    },
+    { path: '/portfolio',    label: '📁 Portfolio' },
+    { path: '/map',          label: '🗺 Map'       },
+    ...(role === 'organizer' || role === 'admin'
+      ? [{ path: '/organizer', label: '📋 Organizer' },
+         { path: '/admin',     label: '🛡️ Admin'     }]
+      : []),
   ]
 
   const logout = () => {
