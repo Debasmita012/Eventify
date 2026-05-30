@@ -3,6 +3,7 @@ import Onboarding from './pages/Onboarding'
 import Feed from './pages/Feed'
 import EventDetail from './pages/EventDetail'
 import OrganizerPortal from './pages/OrganizerPortal'
+import OrganizerSignup from './pages/OrganizerSignup'
 import Analytics from './pages/Analytics'
 import Portfolio from './pages/Portfolio'
 import Leaderboard from './pages/Leaderboard'
@@ -30,6 +31,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to={userId ? "/feed" : "/onboard"} />} />
         <Route path="/onboard" element={<Onboarding />} />
+        <Route path="/organizer-signup" element={<OrganizerSignup />} />
         <Route path="/feed" element={<RequireAuth><Layout><Feed /></Layout></RequireAuth>} />
         <Route path="/event/:id" element={<RequireAuth><Layout><EventDetail /></Layout></RequireAuth>} />
         <Route path="/organizer" element={<RequireAuth><Layout><OrganizerPortal /></Layout></RequireAuth>} />

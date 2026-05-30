@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import API from '../config'
 
 const MEDIAPIPE_HANDS_URL =
   'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js'
@@ -7,12 +6,10 @@ const MEDIAPIPE_CAMERA_URL =
   'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js'
 
 const CHEATSHEET = [
-  { gesture: '👈 Swipe Left', action: 'Previous card' },
-  { gesture: '👉 Swipe Right', action: 'Next card' },
-  { gesture: '👍 Thumbs Up', action: 'RSVP event' },
-  { gesture: '🤌 Pinch', action: 'Save calendar' },
-  { gesture: '✋ Open Palm', action: 'View details' },
-  { gesture: '✊ Fist', action: 'Toggle chat' },
+  { gesture: 'Fist', action: 'RSVP event' },
+  { gesture: 'Open Hand', action: 'Toggle chat' },
+  { gesture: 'Two Fingers Up', action: 'Interested' },
+  { gesture: 'Two Fingers Down', action: 'Dismiss' },
 ]
 
 const CONNECTIONS = [
@@ -29,7 +26,6 @@ const TIPS = [4, 8, 12, 16, 20]
 function loadScript(src) {
   return new Promise((resolve, reject) => {
     if (document.querySelector(`script[src="${src}"]`)) {
-      // already injected — wait until window object is ready
       const poll = setInterval(() => {
         if (src.includes('camera_utils') && window.Camera) { clearInterval(poll); resolve() }
         else if (src.includes('hands') && window.Hands) { clearInterval(poll); resolve() }
@@ -50,7 +46,7 @@ export default function GestureController({
   activeCard,
   setActiveCard,
   onRSVP,
-  onOpenDetail,
+  onBookmark,
   onToggleChat,
 }) {
 
@@ -59,114 +55,177 @@ export default function GestureController({
   const handsRef = useRef(null)
   const cameraRef = useRef(null)
   const cooldown = useRef(false)
-  const wristBuf = useRef([])
+  const lastFired = useRef({ key: null, card: null, at: 0 })
+  const clearFrames = useRef(0)
   const gesHist = useRef([])
   const flashTimer = useRef(null)
+  const advanceTimer = useRef(null)
+  const waitingForClear = useRef(false)
 
   // Keep latest props in refs so callbacks never go stale
   const eventsRef = useRef(events)
   const activeCardRef = useRef(activeCard)
   const setActiveRef = useRef(setActiveCard)
   const onRSVPRef = useRef(onRSVP)
-  const onDetailRef = useRef(onOpenDetail)
+  const onBookmarkRef = useRef(onBookmark)
   const onChatRef = useRef(onToggleChat)
   useEffect(() => { eventsRef.current = events }, [events])
   useEffect(() => { activeCardRef.current = activeCard }, [activeCard])
   useEffect(() => { setActiveRef.current = setActiveCard }, [setActiveCard])
   useEffect(() => { onRSVPRef.current = onRSVP }, [onRSVP])
-  useEffect(() => { onDetailRef.current = onOpenDetail }, [onOpenDetail])
+  useEffect(() => { onBookmarkRef.current = onBookmark }, [onBookmark])
   useEffect(() => { onChatRef.current = onToggleChat }, [onToggleChat])
 
   const [active, setActive] = useState(false)
   const [ready, setReady] = useState(false)
   const [handPresent, setHandPresent] = useState(false)
-  const [flash, setFlash] = useState(null)   // { emoji, label, color }
+  const [flash, setFlash] = useState(null)
   const [showHelp, setShowHelp] = useState(false)
   const [error, setError] = useState('')
+  const [gestureLabel, setGestureLabel] = useState('Show your hand...')
 
-  // ── Classifier ────────────────────────────────────────────────────────
+  // ── Classifier — matches gestureDetector.py exactly ─────────────────
+  /**
+   * fingers_up() equivalent from gestureDetector.py:
+   * - Thumb: tip.x < pip.x  (thumb extends left for right hand)
+   * - Other 4 fingers: tip.y < pip.y  (finger extends upward = lower y value)
+   *
+   * Returns array of 5 booleans: [thumb, index, middle, ring, pinky]
+   */
+  function fingersUp(lm) {
+    const fingers = []
+    // Works for both left and right hands; x-axis checks only recognize one side.
+    const thumbTipDistance = Math.hypot(lm[4].x - lm[0].x, lm[4].y - lm[0].y)
+    const thumbJointDistance = Math.hypot(lm[3].x - lm[0].x, lm[3].y - lm[0].y)
+    fingers.push(thumbTipDistance > thumbJointDistance + 0.025)
+    // Index  — tip=8,  pip=6
+    fingers.push(lm[8].y < lm[6].y)
+    // Middle — tip=12, pip=10
+    fingers.push(lm[12].y < lm[10].y)
+    // Ring   — tip=16, pip=14
+    fingers.push(lm[16].y < lm[14].y)
+    // Pinky  — tip=20, pip=18
+    fingers.push(lm[20].y < lm[18].y)
+    return fingers
+  }
+
   function classify(lm) {
-    const up = (tip, pip) => tip.y < pip.y - 0.025
-    const iExt = up(lm[8], lm[6])
-    const mExt = up(lm[12], lm[10])
-    const rExt = up(lm[16], lm[14])
-    const pExt = up(lm[20], lm[18])
-    const tUp = lm[4].y < lm[3].y - 0.05 && !iExt && !mExt && !rExt && !pExt
-    const dist = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y)
-    const pinch = dist < 0.045 && !mExt && !rExt
-    const palm = iExt && mExt && rExt && pExt
-    const fist = !iExt && !mExt && !rExt && !pExt && !tUp
-    if (tUp) return 'THUMBS_UP'
-    if (pinch) return 'PINCH'
-    if (palm) return 'OPEN_PALM'
-    if (fist) return 'FIST'
+    const [thumb, index, middle, ring, pinky] = fingersUp(lm)
+
+    // Fist: index, middle, ring, pinky closed. Thumb is optional.
+    if (!index && !middle && !ring && !pinky) {
+      return 'FIST'
+    }
+
+    // Open Hand: all fingers up, with a relaxed four-finger fallback.
+    if ((thumb && index && middle && ring && pinky) ||
+      [thumb, index, middle, ring, pinky].filter(Boolean).length >= 4) {
+      return 'OPEN_HAND'
+    }
+
+    // Two Fingers Up: index + middle raised.
+    if (!thumb && index && middle && !ring && !pinky) {
+      return 'TWO_FINGERS_UP'
+    }
+
+    // Two Fingers Down: ring + pinky raised, index + middle down. Thumb optional.
+    if (!index && !middle && ring && pinky) {
+      return 'TWO_FINGERS_DOWN'
+    }
+
     return null
   }
 
   // ── Dispatch ──────────────────────────────────────────────────────────
-  function dispatch(key, wristX) {
-    // swipe detection via buffer
-    if (wristX !== undefined) {
-      wristBuf.current.push(wristX)
-      if (wristBuf.current.length > 6) wristBuf.current.shift()
-      if (wristBuf.current.length === 6) {
-        const delta = wristBuf.current[5] - wristBuf.current[0]
-        if (delta > 0.12) { fire('SWIPE_LEFT'); return }
-        if (delta < -0.12) { fire('SWIPE_RIGHT'); return }
+  function dispatch(key) {
+    if (waitingForClear.current) {
+      if (!key) {
+        clearFrames.current += 1
+        if (clearFrames.current >= 4) {
+          waitingForClear.current = false
+          gesHist.current = []
+          lastFired.current = { key: null, card: null, at: 0 }
+        }
       }
+      return
     }
+
+    // Static gesture — require a steady hold so noisy frames do not repeat-fire.
     if (key) {
+      clearFrames.current = 0
       gesHist.current.push(key)
-      if (gesHist.current.length > 3) gesHist.current.shift()
-      const confirmed = gesHist.current.length >= 2 &&
-        gesHist.current.slice(-2).every(g => g === key)
+      if (gesHist.current.length > 6) gesHist.current.shift()
+      const confirmed =
+        gesHist.current.length >= 5 &&
+        gesHist.current.slice(-5).every(g => g === key)
       if (confirmed) fire(key)
+    } else {
+      clearFrames.current += 1
+      if (clearFrames.current >= 4) {
+        gesHist.current = []
+        lastFired.current = { key: null, card: null, at: 0 }
+      }
     }
   }
 
   function fire(key) {
     if (cooldown.current) return
+    const card = activeCardRef.current
+    const now = Date.now()
+    if (
+      lastFired.current.key === key &&
+      lastFired.current.card === card &&
+      now - lastFired.current.at < 2500
+    ) {
+      return
+    }
+    lastFired.current = { key, card, at: now }
     cooldown.current = true
+    waitingForClear.current = true
     gesHist.current = []
-    wristBuf.current = []
 
     const MAP = {
-      SWIPE_LEFT: { emoji: '👈', label: 'Previous', color: '#6366f1' },
-      SWIPE_RIGHT: { emoji: '👉', label: 'Next', color: '#6366f1' },
-      THUMBS_UP: { emoji: '👍', label: 'RSVP!', color: '#22c55e' },
-      PINCH: { emoji: '🤌', label: 'Save Calendar', color: '#f59e0b' },
-      OPEN_PALM: { emoji: '✋', label: 'View Details', color: '#8b5cf6' },
-      FIST: { emoji: '✊', label: 'Toggle Chat', color: '#ec4899' },
+      FIST: { emoji: '✊', label: 'RSVP!', color: '#22c55e' },
+      OPEN_HAND: { emoji: '✋', label: 'Toggle Chat', color: '#8b5cf6' },
+      TWO_FINGERS_UP: { emoji: '☝️', label: 'Interested', color: '#f59e0b' },
+      TWO_FINGERS_DOWN: { emoji: '👇', label: 'Dismiss', color: '#ef4444' },
     }
-    setFlash(MAP[key])
-    clearTimeout(flashTimer.current)
-    flashTimer.current = setTimeout(() => setFlash(null), 1800)
+    const info = MAP[key]
+    if (info) {
+      setFlash(info)
+      setGestureLabel(`${info.emoji} ${info.label}`)
+      clearTimeout(flashTimer.current)
+      flashTimer.current = setTimeout(() => {
+        setFlash(null)
+        setGestureLabel('Show your hand...')
+      }, 1800)
+    }
 
     const evs = eventsRef.current ?? []
-    const card = activeCardRef.current
     switch (key) {
-      case 'SWIPE_LEFT':
-        setActiveRef.current(c => Math.max(0, c - 1))
-        break
-      case 'SWIPE_RIGHT':
-        setActiveRef.current(c => Math.min(evs.length - 1, c + 1))
-        break
-      case 'THUMBS_UP':
+      case 'FIST':
         if (evs[card]) onRSVPRef.current?.(evs[card])
         break
-      case 'PINCH':
-        if (evs[card])
-          window.open(`${API}/export/${evs[card].id}.ics`, '_blank')
-        break
-      case 'OPEN_PALM':
-        if (evs[card]) onDetailRef.current?.(evs[card])
-        break
-      case 'FIST':
+      case 'OPEN_HAND':
         onChatRef.current?.()
+        break
+      case 'TWO_FINGERS_UP':
+        if (evs[card]) onBookmarkRef.current?.(evs[card])
+        break
+      case 'TWO_FINGERS_DOWN':
         break
     }
 
-    setTimeout(() => { cooldown.current = false }, 900)
+    clearTimeout(advanceTimer.current)
+    if (evs.length > 1 && evs[card]) {
+      advanceTimer.current = setTimeout(() => {
+        setActiveRef.current(() => (card + 1) % evs.length)
+        lastFired.current = { key: null, card: null, at: 0 }
+        setGestureLabel('Show your hand...')
+      }, 3000)
+    }
+
+    setTimeout(() => { cooldown.current = false }, 3200)
   }
 
   // ── Draw skeleton ──────────────────────────────────────────────────────
@@ -181,8 +240,17 @@ export default function GestureController({
     lm.forEach((p, i) => {
       const { x, y } = px(p)
       const tip = TIPS.includes(i)
-      ctx.beginPath(); ctx.arc(x, y, tip ? 4.5 : 2.5, 0, Math.PI * 2)
+      ctx.beginPath(); ctx.arc(x, y, tip ? 5 : 3, 0, Math.PI * 2)
       ctx.fillStyle = tip ? '#818cf8' : 'rgba(255,255,255,0.85)'; ctx.fill()
+    })
+    // Highlight fingertips with color coding
+    const [thumb, index, middle, ring, pinky] = fingersUp(lm)
+    const tipStates = [thumb, index, middle, ring, pinky]
+    TIPS.forEach((tip, i) => {
+      const { x, y } = px(lm[tip])
+      ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2)
+      ctx.fillStyle = tipStates[i] ? '#4ade80' : '#f87171'
+      ctx.fill()
     })
   }
 
@@ -197,8 +265,8 @@ export default function GestureController({
         await loadScript(MEDIAPIPE_HANDS_URL)
         await loadScript(MEDIAPIPE_CAMERA_URL)
       } catch (error) {
-        console.error(error);
-        setError('Could not load MediaPipe. Check your internet connection.')
+        console.error(error)
+        setError('Gesture engine could not load. Check internet connection, then try again.')
         setActive(false); return
       }
       if (cancelled) return
@@ -210,8 +278,8 @@ export default function GestureController({
       hands.setOptions({
         maxNumHands: 1,
         modelComplexity: 1,
-        minDetectionConfidence: 0.7,
-        minTrackingConfidence: 0.6,
+        minDetectionConfidence: 0.6,
+        minTrackingConfidence: 0.55,
       })
 
       hands.onResults(results => {
@@ -224,13 +292,30 @@ export default function GestureController({
 
         if (!results.multiHandLandmarks?.length) {
           setHandPresent(false)
-          wristBuf.current = []; gesHist.current = []
+          setGestureLabel('Show your hand...')
+          gesHist.current = []
+          lastFired.current = { key: null, card: null, at: 0 }
+          waitingForClear.current = false
           return
         }
         setHandPresent(true)
         const lm = results.multiHandLandmarks[0]
         drawSkeleton(ctx, lm, canvas.width, canvas.height)
-        dispatch(classify(lm), lm[0].x)
+
+        const key = classify(lm)
+
+        // Show live gesture name
+        if (key) {
+          const LABELS = {
+            FIST: '✊ Fist',
+            OPEN_HAND: '✋ Open Hand',
+            TWO_FINGERS_UP: '☝️ Two Fingers Up',
+            TWO_FINGERS_DOWN: '👇 Two Fingers Down',
+          }
+          if (!cooldown.current) setGestureLabel(LABELS[key] || '✋ Detected')
+        }
+
+        dispatch(key)
       })
 
       handsRef.current = hands
@@ -253,11 +338,13 @@ export default function GestureController({
       cameraRef.current?.stop()
       handsRef.current?.close()
       handsRef.current = null; cameraRef.current = null
-      wristBuf.current = []; gesHist.current = []
+      gesHist.current = []
+      waitingForClear.current = false
+      clearTimeout(advanceTimer.current)
       setReady(false); setHandPresent(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active]) // only runs when toggling on/off
+  }, [active])
 
   const dotColor = !ready ? '#fbbf24' : handPresent ? '#4ade80' : '#f87171'
   const curEvent = events?.[activeCard]
@@ -353,7 +440,7 @@ export default function GestureController({
                   animation: 'gc-spin .75s linear infinite',
                 }} />
                 <span style={{ color: '#94a3b8', fontSize: 11 }}>
-                  Loading model…
+                  Loading MediaPipe…
                 </span>
               </div>
             )}
@@ -381,6 +468,15 @@ export default function GestureController({
               color: 'rgba(148,163,184,.8)',
               textTransform: 'uppercase', letterSpacing: '.1em',
             }}>LIVE</div>
+
+            {/* Gesture label */}
+            {ready && handPresent && !flash && (
+              <div style={{
+                position: 'absolute', bottom: 6, left: 0, right: 0,
+                textAlign: 'center',
+                color: 'rgba(255,255,255,0.8)', fontSize: 10, fontWeight: 600,
+              }}>{gestureLabel}</div>
+            )}
 
             {/* Gesture flash */}
             {flash && (
@@ -484,9 +580,9 @@ export default function GestureController({
             }}>
               💡 <strong>Tips</strong><br />
               • Hand 30–50 cm from camera<br />
-              • Good lighting, face the camera<br />
-              • Hold static gestures ~0.5 s<br />
-              • Swipe firmly left or right
+              • Green dot = finger UP<br />
+              • Red dot = finger DOWN<br />
+              • Hold gestures ~0.5s firmly
             </div>
           </div>
         )}
