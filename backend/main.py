@@ -26,7 +26,7 @@ app.add_middleware(CORSMiddleware,
 @app.on_event("startup")
 def startup():
     init_db()
-    print("✅ EventSync API started")
+    print("✅ Eventify API started")
 
 # ── Models ────────────────────────────────────
 class OnboardReq(BaseModel):
@@ -62,7 +62,7 @@ class ChatReq(BaseModel):
 # ── Health check ──────────────────────────────
 @app.get("/")
 def root():
-    return {"status": "EventSync API running ✅"}
+    return {"status": "Eventify API running ✅"}
 
 # ── Auth / Onboarding ─────────────────────────
 @app.post("/onboard")

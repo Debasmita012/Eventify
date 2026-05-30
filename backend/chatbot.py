@@ -6,7 +6,7 @@ QA_PAIRS = [
   (["how are you","how r u","wassup","what's up"],
    "I'm doing great! 🙌 What event can I help you find today?"),
   (["who are you","what are you","introduce yourself"],
-   "I'm CampusBot 🤖 — your smart campus event assistant for EventSync at RCCIT!"),
+   "I'm CampusBot 🤖 — your smart campus event assistant for Eventify at RCCIT!"),
   (["bye","goodbye","see you","cya"],
    "Bye! 👋 Don't forget to check your upcoming RSVPs!"),
   (["thanks","thank you","thx","ty"],
@@ -102,7 +102,7 @@ QA_PAIRS = [
   (["calendar","add to calendar","ics","google calendar"],
    "Click the 📅 button on any event card to download an .ics file for Google Calendar, Apple Calendar, or Outlook!"),
   (["conflict","clash","two events same time"],
-   "EventSync auto-detects clashes! When you RSVP to an overlapping event you'll see a ⚠️ warning instantly."),
+   "Eventify auto-detects clashes! When you RSVP to an overlapping event you'll see a ⚠️ warning instantly."),
 
   (["search","how to search","find event"],
    "Use the search bar at the top of your feed! Type naturally like 'music tonight' or 'coding workshop' 🔍"),
@@ -138,10 +138,10 @@ QA_PAIRS = [
 
   (["help","support","what can you do"],
    "Ask me about events by category, RSVP help, MAR points, gestures, or features! Try: 'any tech events?' 🤖"),
-  (["about","about app","about eventsync","what is eventsync"],
-   "EventSync is a smart campus event platform by Team REALX (RCCIT). AI-powered, gesture-controlled, personalised! 🎓"),
+  (["about","about app","about eventify","what is eventify"],
+   "Eventify is a smart campus event platform by Team REALX (RCCIT). AI-powered, gesture-controlled, personalised! 🎓"),
   (["team","who built","developers","realx"],
-   "EventSync is built by Team REALX from RCCIT — Debasmita, Adrija, and Rishi. Made with ❤️ for students!"),
+   "Eventify is built by Team REALX from RCCIT — Debasmita, Adrija, and Rishi. Made with ❤️ for students!"),
 ]
 
 COMPILED = [(set(kws), resp) for kws, resp in QA_PAIRS]
