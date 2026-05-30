@@ -88,6 +88,12 @@ class EventCreate(BaseModel):
     registration_link: Optional[str]       = ""
     agenda:            Optional[List]      = []        # [{time, session, speaker?}]
     tags:              Optional[List[str]] = []
+    problems:          Optional[List[dict]] = []       # [{title, description}]
+    sub_events:        Optional[List[dict]] = []       # [{title, time, venue, description}]
+    sponsors:          Optional[List[dict]] = []       # [{name, logo_url, tier}]
+    contact_email:     Optional[str]       = ""
+    contact_phone:     Optional[str]       = ""
+    brochure_url:      Optional[str]       = ""
 
 class ChatReq(BaseModel):
     user_id: str
@@ -266,6 +272,12 @@ def create_event(req: EventCreate):
         "registration_link": req.registration_link,
         "agenda":            req.agenda,
         "tags":              req.tags,
+        "problems":          req.problems,
+        "sub_events":        req.sub_events,
+        "sponsors":          req.sponsors,
+        "contact_email":     req.contact_email,
+        "contact_phone":     req.contact_phone,
+        "brochure_url":      req.brochure_url,
         # Phase + live fields (managed separately via PATCH)
         "phase":             "before",
         "current_session":   "",
@@ -295,7 +307,7 @@ def get_feed(user_id: str):
         raise HTTPException(404, "User not found")
     all_events = list(db.events.find({}, {"_id": 0})
                                .sort("rsvp_count", -1))
-    return recommend_events(all_events, user["interests"], n=8)
+    return recommend_events(all_events, user.get("interests", []), n=8)
 
 @app.get("/search")
 def search(q: str = Query(...)):
@@ -311,7 +323,7 @@ def surprise(user_id: str):
     if not user:
         raise HTTPException(404)
     all_events = list(db.events.find({}, {"_id": 0}))
-    result     = get_surprise(all_events, user["interests"])
+    result     = get_surprise(all_events, user.get("interests", []))
     if not result:
         raise HTTPException(404, "No events found")
     return result

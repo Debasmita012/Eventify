@@ -41,6 +41,7 @@ export default function EventDetail() {
   const [activeTab, setActiveTab] = useState('overview')
   const [showConfetti, setShowConfetti] = useState(false)
   const [showQR, setShowQR] = useState(false)
+  const [viewMode, setViewMode] = useState('public') // 'public' | 'organizer'
 
   // Sub-modules state
   const [announcements, setAnnouncements] = useState([])
@@ -770,9 +771,35 @@ export default function EventDetail() {
     tabDeck.push({ id: 'organizer', label: 'ORGANIZER CONTROL' })
   }
 
+  if (!event) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0f172a] text-slate-100 font-bold text-xl">
+        Loading Event Details...
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-20 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#0f172a] text-slate-100 pb-20 relative overflow-hidden font-sans">
       
+      {/* Organizer View Toggle */}
+      {(userRole === 'organizer' || userRole === 'admin') && (
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 bg-slate-900 p-2 rounded-2xl shadow-2xl border border-slate-800">
+          <button 
+            onClick={() => setViewMode('public')}
+            className={`px-4 py-2 rounded-xl font-bold text-sm transition ${viewMode === 'public' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
+          >
+            👀 Student View
+          </button>
+          <button 
+            onClick={() => setViewMode('organizer')}
+            className={`px-4 py-2 rounded-xl font-bold text-sm transition ${viewMode === 'organizer' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
+          >
+            🛠️ Organizer View
+          </button>
+        </div>
+      )}
+
       {/* Blurry gradient bubbles for design aesthetics */}
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px]" />
       <div className="absolute bottom-[20%] right-[-10%] w-96 h-96 bg-purple-500/10 rounded-full blur-[100px]" />
@@ -791,17 +818,17 @@ export default function EventDetail() {
 
         {/* Horizontal Navigation List (Screenshot 1: About, Problems, Events, Timeline...) */}
         <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-400">
-          <button onClick={() => { setActiveTab('overview'); setTimeout(() => document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth' }), 100) }} className="hover:text-indigo-400 transition">About</button>
+          <button onClick={() => document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-indigo-400 transition">About</button>
           
           {event.event_type === 'hackathon' && (
-            <button onClick={() => { setActiveTab('overview'); setTimeout(() => document.getElementById('problems-section')?.scrollIntoView({ behavior: 'smooth' }), 100) }} className="bg-slate-800 text-indigo-400 border border-slate-700 px-3 py-1 rounded-full hover:bg-slate-700 transition">Problems</button>
+            <button onClick={() => document.getElementById('problems-section')?.scrollIntoView({ behavior: 'smooth' })} className="bg-slate-800 text-indigo-400 border border-slate-700 px-3 py-1 rounded-full hover:bg-slate-700 transition">Problems</button>
           )}
 
-          <button onClick={() => { setActiveTab('prizes'); }} className="hover:text-indigo-400 transition">Prizes</button>
-          <button onClick={() => { setActiveTab('schedule'); }} className="hover:text-indigo-400 transition">Timeline</button>
-          <button onClick={() => { setActiveTab('dashboard'); }} className="hover:text-indigo-400 transition">Events / Dashboard</button>
-          <button onClick={() => { setActiveTab('dashboard'); setTimeout(() => document.getElementById('food-section')?.scrollIntoView({ behavior: 'smooth' }), 100) }} className="hover:text-indigo-400 transition">Food Court</button>
-          <button onClick={() => { setActiveTab('dashboard'); setTimeout(() => document.getElementById('helpdesk-section')?.scrollIntoView({ behavior: 'smooth' }), 100) }} className="hover:text-indigo-400 transition">Contact Us / Support</button>
+          <button onClick={() => document.getElementById('prizes-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-indigo-400 transition">Prizes</button>
+          <button onClick={() => document.getElementById('schedule-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-indigo-400 transition">Timeline</button>
+          <button onClick={() => document.getElementById('dashboard-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-indigo-400 transition">Dashboard</button>
+          <button onClick={() => document.getElementById('food-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-indigo-400 transition">Food Court</button>
+          <button onClick={() => document.getElementById('helpdesk-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-indigo-400 transition">Contact Us / Support</button>
           
           {event.phase === 'after' ? (
             <button onClick={handleDownloadCertificate} className="bg-amber-600/90 text-white px-3 py-1 rounded-full hover:bg-amber-600 transition flex items-center gap-1 border border-amber-400/20">
@@ -842,8 +869,7 @@ export default function EventDetail() {
             
             <button 
               onClick={() => {
-                setActiveTab('dashboard')
-                setTimeout(() => document.getElementById('quiz-arena-section')?.scrollIntoView({ behavior: 'smooth' }), 100)
+                document.getElementById('dashboard-section')?.scrollIntoView({ behavior: 'smooth' })
               }}
               className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs px-4 py-2 rounded-xl transition"
             >
@@ -852,29 +878,14 @@ export default function EventDetail() {
           </div>
         )}
 
-        {/* Tab System bar (Screenshot 2: OVERVIEW, PRIZES, SCHEDULE, LEADERBOARD, DASHBOARD) */}
-        <div className="flex overflow-x-auto gap-2 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-900 backdrop-blur-md mb-6 justify-center scrollbar-hide">
-          {tabDeck.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-2.5 rounded-xl text-xs font-black tracking-wider transition ${
-                activeTab === tab.id
-                  ? 'bg-blue-600 text-white shadow-lg border border-blue-400/20'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        
 
         {/* ── TAB PORTALS ─────────────────────────────────────────────────── */}
         <div className="bg-slate-900/40 border border-slate-900 rounded-3xl p-6 backdrop-blur-md">
 
           {/* 1. OVERVIEW TAB (Screenshot 2 / 3 details: description, venue highlight, rules, Accordion FAQs) */}
-          {activeTab === 'overview' && (
-            <div className="space-y-8" id="about-section">
+          <div id="about-section" className="py-20 max-w-7xl mx-auto scroll-mt-24">
+            <div className="space-y-8">
               
               {/* Description Card (Screenshot 2 style) */}
               <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl space-y-4">
@@ -915,10 +926,22 @@ export default function EventDetail() {
 
               {/* Category Specific Problems Deck (Screenshot 1 "Problems" link target) */}
               {event.event_type === 'hackathon' && (
-                <div className="bg-gradient-to-br from-indigo-950/20 to-slate-900 border border-indigo-500/20 p-6 rounded-3xl space-y-4 shadow-xl" id="problems-section">
+                <div className="bg-gradient-to-br from-indigo-950/20 to-slate-900 border border-indigo-500/20 p-6 rounded-3xl space-y-4 shadow-xl scroll-mt-24" id="problems-section">
                   <h3 className="font-black text-white text-base flex items-center gap-2">
                     <span>💻</span> HACKATHON PROBLEMS & TRACKS
                   </h3>
+                  <div className="flex gap-2 items-center mt-2">
+                    <button 
+                      onClick={() => {
+                        const link = `${window.location.origin}/event/${id}?playQuiz=true`;
+                        navigator.clipboard.writeText(link);
+                        alert(`Shareable Quiz Link Copied: \n${link}`);
+                      }} 
+                      className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-indigo-500/40 transition"
+                    >
+                      🔗 {userRole === 'organizer' ? 'Generate Link' : 'Get Play Link'}
+                    </button>
+                  </div>
                   
                   {event.specifics?.hackathon_problem_statements ? (
                     <div className="space-y-4">
@@ -977,12 +1000,12 @@ export default function EventDetail() {
                       onClick={() => toggleFAQ(1)}
                       className="w-full px-5 py-4 flex justify-between items-center font-bold text-slate-200 text-sm hover:text-white transition"
                     >
-                      <span>What is Synchronicity S2?</span>
+                      <span>What is {event.title}?</span>
                       <span className="text-slate-500 text-lg">{expandedFAQ[1] ? '▲' : '▼'}</span>
                     </button>
                     {expandedFAQ[1] && (
                       <div className="px-5 pb-4 text-xs text-slate-400 leading-relaxed border-t border-slate-800/40 pt-3">
-                        Synchronicity S2 is a national-level 24-hour hackathon hosted by the Jadavpur University ACM Student Chapter. It's a high-energy, innovation-filled event where students from all over come together to build tech-based solutions in a creatively tropical atmosphere.
+                        {event.title} is an exciting event hosted on Eventify. It's a high-energy, innovation-filled event where participants from all over come together to collaborate, learn, and showcase their skills.
                       </div>
                     )}
                   </div>
@@ -998,7 +1021,7 @@ export default function EventDetail() {
                     </button>
                     {expandedFAQ[2] && (
                       <div className="px-5 pb-4 text-xs text-slate-400 leading-relaxed border-t border-slate-800/40 pt-3">
-                        Synchronicity S2 is open to all college students across India. Whether you're a developer, designer, or just someone with great ideas, you're welcome!
+                        {event.title} is open to all enthusiasts and participants! Whether you're a beginner, a professional, or just someone with great ideas, you're welcome to join and participate!
                       </div>
                     )}
                   </div>
@@ -1006,10 +1029,10 @@ export default function EventDetail() {
               </div>
 
             </div>
-          )}
+          </div>
 
           {/* 2. PRIZES TAB */}
-          {activeTab === 'prizes' && (
+          <div id="prizes-section" className="py-20 max-w-7xl mx-auto scroll-mt-24">
             <div className="space-y-6">
               <h3 className="text-lg font-black text-white flex items-center gap-2">
                 <span>🏆</span> Prize Pool & Sponsors
@@ -1069,10 +1092,10 @@ export default function EventDetail() {
               </div>
 
             </div>
-          )}
+          </div>
 
           {/* 3. SCHEDULE TAB */}
-          {activeTab === 'schedule' && (
+          <div id="schedule-section" className="py-20 max-w-7xl mx-auto scroll-mt-24">
             <div className="space-y-6">
               <h3 className="font-black text-white text-base flex items-center gap-2">
                 <span>📅</span> Sessions & Hackathon Timeline
@@ -1106,10 +1129,10 @@ export default function EventDetail() {
                 </div>
               )}
             </div>
-          )}
+          </div>
 
           {/* 4. LEADERBOARD TAB */}
-          {activeTab === 'leaderboard' && (
+          <div id="leaderboard-section" className="py-20 max-w-7xl mx-auto scroll-mt-24">
             <div className="space-y-6">
               <h3 className="text-lg font-black text-white flex items-center gap-2">
                 <span>🏆</span> Gamified XP Leaderboard
@@ -1139,81 +1162,17 @@ export default function EventDetail() {
                 </div>
               </div>
             </div>
-          )}
+          </div>
 
           {/* 5. DASHBOARD TAB (All-In-One Events Deck: Quizzes, Food management, Support) */}
-          {activeTab === 'dashboard' && (
+          <div id="dashboard-section" className="py-20 max-w-7xl mx-auto">
             <div className="space-y-8">
               
-              {/* Event command row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                {/* Live Info Ticker */}
-                <div className="bg-gradient-to-br from-indigo-950/20 to-slate-900 border border-indigo-500/10 p-5 rounded-2xl space-y-3">
-                  <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider">Broadcasting Stream</h4>
-                  
-                  {announcements.length === 0 ? (
-                    <div className="text-xs text-slate-600 italic">No pinned announcements broadcasted.</div>
-                  ) : (
-                    <div className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 p-3 rounded-xl text-xs leading-relaxed font-semibold">
-                      📢 {announcements[0].message}
-                    </div>
-                  )}
-
-                  <div className="text-[10px] text-slate-500 font-mono uppercase">Countdown: {countdownString}</div>
-                </div>
-
-                {/* Quick Check-in Logger */}
-                <div className="bg-slate-800/20 border border-slate-800 p-5 rounded-2xl space-y-3">
-                  <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider">Check-in Status</h4>
-                  
-                  {checkedInZone ? (
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl text-center text-xs font-bold">
-                      ✅ Checked In at room: {checkedInZone}
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <select 
-                        value={selectedZone}
-                        onChange={e => setSelectedZone(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none"
-                      >
-                        <option value="Main Stage">Main Stage</option>
-                        <option value="Registration Gate">Registration Desk</option>
-                        <option value="Food Court">F&B Court</option>
-                        <option value="Networking Lounge">Networking Area</option>
-                      </select>
-                      <button onClick={handleCheckIn} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-1.5 rounded-lg transition">
-                        Verify Attendance
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Entry Ticket Modal trigger */}
-                <div className="bg-slate-850 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
-                  <div>
-                    <h4 className="text-slate-400 text-xs font-bold uppercase tracking-wider">Entry Ticket</h4>
-                    <p className="text-[10px] text-slate-500 mt-1">Show QR to verify at main college gate.</p>
-                  </div>
-                  {rsvpd ? (
-                    <button onClick={() => setShowQR(true)} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2 rounded-lg transition mt-2">
-                      Open Ticket QR
-                    </button>
-                  ) : (
-                    <button onClick={handleRSVP} className="w-full bg-indigo-600 hover:bg-indigo-750 text-white font-bold text-xs py-2 rounded-lg transition mt-2">
-                      RSVP to get ticket
-                    </button>
-                  )}
-                </div>
-
-              </div>
-
               {/* ── ALL-IN-ONE QUIZ ARENA INTEGRATION ── */}
               <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl space-y-4" id="quiz-arena-section">
                 <div className="flex justify-between items-center">
                   <h3 className="font-black text-white text-sm flex items-center gap-2">
-                    <span>📝</span> Live Quiz Arena (All-In-One Player)
+                    <span>📝</span> Live Quiz Arena
                   </h3>
                   
                   {quizzes.length > 0 && (
@@ -1466,10 +1425,10 @@ export default function EventDetail() {
               </div>
 
             </div>
-          )}
+          </div>
 
           {/* 6. ANALYTICS TAB (Organizer Only) */}
-          {activeTab === 'analytics' && (
+          {viewMode === 'organizer' && (userRole === 'organizer' || userRole === 'admin') && (
             <div className="space-y-6">
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -1541,7 +1500,8 @@ export default function EventDetail() {
           )}
 
           {/* 7. ORGANIZER CONTROL TAB (Organizer Only) */}
-          {activeTab === 'organizer' && (
+          {/* ── ORGANIZER MODE ── */}
+      {viewMode === 'organizer' && (userRole === 'organizer' || userRole === 'admin') && (
             <div className="space-y-6">
               
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

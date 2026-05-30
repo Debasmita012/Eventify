@@ -3,7 +3,42 @@ import json
 from datetime import datetime
 
 events = [
-  {"id":1,  "title":"HackIIIT 2025","description":"48-hour hackathon open to all branches. Build real products, win prizes worth ₹2 lakhs. Mentors from Google and Microsoft on site.","category":"tech","venue":"Main Auditorium","lat":22.578,"lng":88.432,"datetime":"2025-11-15 09:00","rsvp_count":142,"image_url":"https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400","why_it_matters":"Boosts your resume + MAR points"},
+  {
+    "id":1,
+    "title":"HackIIIT 2025",
+    "description":"48-hour hackathon open to all branches. Build real products, win prizes worth ₹2 lakhs. Mentors from Google and Microsoft on site.",
+    "category":"tech",
+    "venue":"Main Auditorium",
+    "lat":22.578,"lng":88.432,
+    "datetime":"2025-11-15 09:00",
+    "rsvp_count":142,
+    "image_url":"https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200",
+    "why_it_matters":"Boosts your resume + MAR points",
+    "event_type": "hackathon",
+    "problems": [
+      {"title": "FinTech Revolution", "description": "Build decentralized apps for microlending."},
+      {"title": "EdTech for All", "description": "Create accessible learning platforms for rural students."},
+      {"title": "Sustainable Campus", "description": "IoT solutions to reduce electricity & water waste."}
+    ],
+    "sub_events": [
+      {"title": "Pitch Perfect", "time": "Day 2, 4:00 PM", "venue": "Seminar Hall", "description": "A 5-minute elevator pitch to VC judges."},
+      {"title": "Midnight Coding Relay", "time": "Day 1, 11:59 PM", "venue": "Main Arena", "description": "Pass the keyboard every 30 mins to build a mini-game."}
+    ],
+    "agenda": [
+      {"time": "09:00 AM", "session": "Opening Ceremony", "speaker": "Dr. Smith"},
+      {"time": "10:30 AM", "session": "Hacking Begins", "speaker": "Organizers"},
+      {"time": "06:00 PM", "session": "Dinner & Networking", "speaker": ""},
+      {"time": "10:00 AM", "session": "Submissions Closed", "speaker": ""}
+    ],
+    "sponsors": [
+      {"name": "Google", "logo_url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg", "tier": "Title Sponsor"},
+      {"name": "Microsoft", "logo_url": "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg", "tier": "Co-Sponsor"},
+      {"name": "GitHub", "logo_url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg", "tier": "Platform Partner"}
+    ],
+    "contact_email": "hello@hackiiit.in",
+    "contact_phone": "+91 98765 43210",
+    "brochure_url": "#"
+  },
   {"id":2,  "title":"TEDx Campus","description":"Student speakers on innovation, mental health, climate action and entrepreneurship.","category":"cultural","venue":"Open Air Theatre","lat":22.579,"lng":88.431,"datetime":"2025-11-18 17:00","rsvp_count":89,"image_url":"https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400","why_it_matters":"Expand your worldview"},
   {"id":3,  "title":"IPL Watch Party","description":"Live screening of the final match with giant screen, food stalls, and live commentary.","category":"sports","venue":"Sports Complex","lat":22.576,"lng":88.433,"datetime":"2025-11-20 19:30","rsvp_count":210,"image_url":"https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400","why_it_matters":"Unwind + socialize"},
   {"id":4,  "title":"Resume Workshop","description":"Google HR reviews your resume live. Limited to 30 seats. Bring printed copies.","category":"career","venue":"Seminar Hall B","lat":22.580,"lng":88.430,"datetime":"2025-11-16 14:00","rsvp_count":67,"image_url":"https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400","why_it_matters":"Direct placement prep"},
@@ -53,6 +88,17 @@ def seed():
     })
 
     # Insert events
+    for ev in events:
+        if "agenda" not in ev:
+            ev["agenda"] = [
+                {"time": "09:00 AM", "session": "Opening Ceremony", "speaker": "Organizers"},
+                {"time": "10:00 AM", "session": "Main Event Starts", "speaker": "Various"},
+                {"time": "06:00 PM", "session": "Closing & Networking", "speaker": ""}
+            ]
+        if "sponsors" not in ev:
+            ev["sponsors"] = [
+                {"name": "GitHub", "logo_url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg", "tier": "Platform Partner"}
+            ]
     db.events.insert_many(events)
     print(f"Seeded {len(events)} events into MongoDB")
 

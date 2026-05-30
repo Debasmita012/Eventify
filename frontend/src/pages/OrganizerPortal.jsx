@@ -1,671 +1,404 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
-import API from '../config'
+import React from 'react';
 
-const CATS      = ['tech','cultural','sports','music','career','wellness','gaming']
-const EVT_TYPES = ['campus','hackathon','workshop','competition','conference','cultural','internship','placement']
-const RESOURCE_ICONS = ['📄','📊','🎥','💻','🔗','📑','🎤','🖼']
-
-// ── Agenda Builder ────────────────────────────────────────────────────────
-function AgendaBuilder({ items, onChange }) {
-  const add = () => onChange([...items, { time: '', session: '', speaker: '' }])
-  const remove = (i) => onChange(items.filter((_, idx) => idx !== i))
-  const update = (i, field, val) => {
-    const next = [...items]
-    next[i] = { ...next[i], [field]: val }
-    onChange(next)
-  }
+export default function OrganizerPortal() {
   return (
-    <div>
-      <div className="flex items-center justify-between mb-2">
-        <label className="text-xs font-medium text-gray-500">Agenda Items</label>
-        <button type="button" onClick={add}
-          className="text-xs text-indigo-600 font-semibold hover:text-indigo-800 transition">
-          + Add item
-        </button>
-      </div>
-      {items.length === 0 && (
-        <div className="border-2 border-dashed border-gray-200 rounded-xl p-4
-          text-center text-xs text-gray-400 cursor-pointer hover:border-indigo-300
-          hover:text-indigo-400 transition" onClick={add}>
-          Click to add agenda items (e.g. 10:00 AM — Keynote)
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800">
+      <div className="max-w-6xl mx-auto space-y-6">
+        
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Organizer Dashboard Portal</h1>
+            <p className="text-sm text-slate-500 mt-1">Control live feed, metrics, attendance and verification approvals</p>
+          </div>
+          <div className="flex items-center gap-2 bg-white border border-slate-200 shadow-sm rounded-full px-4 py-2 text-sm font-semibold text-slate-700">
+            <span className="text-slate-400">🛡️</span> Event Organizer
+          </div>
         </div>
-      )}
-      <div className="space-y-2">
-        {items.map((item, i) => (
-          <div key={i} className="flex gap-2 items-start">
-            <input value={item.time} onChange={e => update(i, 'time', e.target.value)}
-              placeholder="9:00 AM"
-              className="w-24 flex-shrink-0 border border-gray-200 rounded-lg px-2 py-2
-                text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            <input value={item.session} onChange={e => update(i, 'session', e.target.value)}
-              placeholder="Session name"
-              className="flex-1 border border-gray-200 rounded-lg px-2 py-2
-                text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            <input value={item.speaker} onChange={e => update(i, 'speaker', e.target.value)}
-              placeholder="Speaker (opt)"
-              className="w-28 flex-shrink-0 border border-gray-200 rounded-lg px-2 py-2
-                text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            <button type="button" onClick={() => remove(i)}
-              className="text-red-400 hover:text-red-600 text-lg leading-none pt-1.5 flex-shrink-0">
-              ×
-            </button>
+
+        {/* Top Stats Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {/* ACTIVE EVENTS */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-32 transition hover:shadow-md">
+            <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Active Events</div>
+            <div className="flex justify-between items-end">
+              <div className="text-4xl font-black text-slate-800">3</div>
+              <div className="text-2xl text-orange-500">⚡</div>
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ── Skills/Tags multi-input ───────────────────────────────────────────────
-function TagInput({ label, value, onChange, placeholder }) {
-  const [input, setInput] = useState('')
-  const add = () => {
-    const t = input.trim()
-    if (t && !value.includes(t)) onChange([...value, t])
-    setInput('')
-  }
-  const remove = (t) => onChange(value.filter(x => x !== t))
-  return (
-    <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
-      <div className="flex flex-wrap gap-1.5 mb-1.5">
-        {value.map(t => (
-          <span key={t} className="bg-indigo-100 text-indigo-700 text-xs px-2.5 py-1
-            rounded-full flex items-center gap-1 font-medium">
-            {t}
-            <button onClick={() => remove(t)} className="hover:text-red-500 transition">×</button>
-          </span>
-        ))}
-      </div>
-      <div className="flex gap-2">
-        <input value={input} onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), add())}
-          placeholder={placeholder}
-          className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-xs
-            focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-        <button type="button" onClick={add}
-          className="text-xs px-3 py-2 bg-indigo-100 text-indigo-700
-            rounded-xl font-semibold hover:bg-indigo-200 transition flex-shrink-0">
-          Add
-        </button>
-      </div>
-    </div>
-  )
-}
-
-// ── Winners Builder ───────────────────────────────────────────────────────
-function WinnersBuilder({ items, onChange }) {
-  const add = () => onChange([...items, { name: '', prize: '' }])
-  const remove = (i) => onChange(items.filter((_, idx) => idx !== i))
-  const update = (i, field, val) => {
-    const next = [...items]; next[i] = { ...next[i], [field]: val }; onChange(next)
-  }
-  const medals = ['🥇','🥈','🥉','🏅']
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-2">
-        <label className="text-xs font-medium text-gray-500">Winners</label>
-        <button type="button" onClick={add}
-          className="text-xs text-indigo-600 font-semibold hover:text-indigo-800 transition">
-          + Add winner
-        </button>
-      </div>
-      <div className="space-y-2">
-        {items.map((w, i) => (
-          <div key={i} className="flex gap-2 items-center">
-            <span className="text-xl flex-shrink-0">{medals[i] || '🏅'}</span>
-            <input value={w.name} onChange={e => update(i, 'name', e.target.value)}
-              placeholder="Team / Person name"
-              className="flex-1 border border-gray-200 rounded-lg px-2 py-2 text-xs
-                focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            <input value={w.prize} onChange={e => update(i, 'prize', e.target.value)}
-              placeholder="Prize (opt)"
-              className="w-32 flex-shrink-0 border border-gray-200 rounded-lg px-2 py-2
-                text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            <button type="button" onClick={() => remove(i)}
-              className="text-red-400 hover:text-red-600 text-lg flex-shrink-0">×</button>
+          {/* TOTAL RSVPS */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-32 transition hover:shadow-md">
+            <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Total RSVPs</div>
+            <div className="flex justify-between items-end">
+              <div className="text-4xl font-black text-slate-800">842</div>
+              <div className="text-2xl text-indigo-700">👥</div>
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ── Resources Builder ─────────────────────────────────────────────────────
-function ResourcesBuilder({ items, onChange }) {
-  const add = () => onChange([...items, { label: '', url: '', icon: '📄' }])
-  const remove = (i) => onChange(items.filter((_, idx) => idx !== i))
-  const update = (i, field, val) => {
-    const next = [...items]; next[i] = { ...next[i], [field]: val }; onChange(next)
-  }
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-2">
-        <label className="text-xs font-medium text-gray-500">Resources / Links</label>
-        <button type="button" onClick={add}
-          className="text-xs text-indigo-600 font-semibold hover:text-indigo-800 transition">
-          + Add resource
-        </button>
-      </div>
-      <div className="space-y-2">
-        {items.map((r, i) => (
-          <div key={i} className="flex gap-2 items-center">
-            <select value={r.icon} onChange={e => update(i, 'icon', e.target.value)}
-              className="w-10 text-center border border-gray-200 rounded-lg py-2
-                text-sm focus:outline-none flex-shrink-0">
-              {RESOURCE_ICONS.map(ic => <option key={ic} value={ic}>{ic}</option>)}
-            </select>
-            <input value={r.label} onChange={e => update(i, 'label', e.target.value)}
-              placeholder="Label (e.g. Workshop PPT)"
-              className="w-40 flex-shrink-0 border border-gray-200 rounded-lg px-2 py-2
-                text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            <input value={r.url} onChange={e => update(i, 'url', e.target.value)}
-              placeholder="https://..."
-              className="flex-1 border border-gray-200 rounded-lg px-2 py-2 text-xs
-                focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            <button type="button" onClick={() => remove(i)}
-              className="text-red-400 hover:text-red-600 text-lg flex-shrink-0">×</button>
+          {/* VEG ORDERS */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-32 transition hover:shadow-md">
+            <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Veg Orders</div>
+            <div className="flex justify-between items-end">
+              <div className="text-4xl font-black text-slate-800">181</div>
+              <div className="text-2xl">🥗</div>
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ── Section toggle wrapper ────────────────────────────────────────────────
-function Section({ title, icon, defaultOpen = false, children }) {
-  const [open, setOpen] = useState(defaultOpen)
-  return (
-    <div className="border border-gray-100 rounded-xl overflow-hidden">
-      <button type="button" onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-4 py-3
-          bg-gray-50 hover:bg-gray-100 transition text-left">
-        <span className="font-medium text-sm text-gray-700">{icon} {title}</span>
-        <span className={`text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>▾</span>
-      </button>
-      {open && <div className="px-4 py-4 space-y-3">{children}</div>}
-    </div>
-  )
-}
-
-// ── Live Controls panel ───────────────────────────────────────────────────
-function LiveControls({ event, onDone }) {
-  const [live, setLive] = useState({
-    phase:           event.phase || 'before',
-    current_session: event.current_session || '',
-    next_session:    event.next_session    || '',
-    announcement:    event.announcement   || '',
-    poll_question:   event.poll_question  || '',
-    poll_options:    (event.poll_options  || []).join('\n'),
-    live_count:      event.live_count     || 0,
-  })
-  const [after, setAfter] = useState({
-    winners:     event.winners    || [],
-    resources:   event.resources  || [],
-    recap:       event.recap      || '',
-    photos:      (event.photos || []).join('\n'),
-    final_count: event.final_count || 0,
-  })
-  const [tab,     setTab]     = useState('live')
-  const [saving,  setSaving]  = useState(false)
-  const [saved,   setSaved]   = useState('')
-
-  const saveLive = async () => {
-    setSaving(true)
-    try {
-      await axios.patch(`${API}/events/${event.id}/live`, {
-        organizer_id:    localStorage.getItem('user_id'),
-        phase:           live.phase,
-        current_session: live.current_session,
-        next_session:    live.next_session,
-        announcement:    live.announcement,
-        poll_question:   live.poll_question,
-        poll_options:    live.poll_options.split('\n').map(s => s.trim()).filter(Boolean),
-        live_count:      parseInt(live.live_count) || 0,
-      })
-      setSaved('Live state updated ✅')
-      setTimeout(() => { setSaved(''); onDone() }, 1800)
-    } catch { alert('Failed to update live state') }
-    setSaving(false)
-  }
-
-  const saveAfter = async () => {
-    setSaving(true)
-    try {
-      await axios.patch(`${API}/events/${event.id}/after`, {
-        organizer_id: localStorage.getItem('user_id'),
-        winners:      after.winners,
-        resources:    after.resources,
-        recap:        after.recap,
-        photos:       after.photos.split('\n').map(s => s.trim()).filter(Boolean),
-        final_count:  parseInt(after.final_count) || 0,
-      })
-      setSaved('After-event content published ✅')
-      setTimeout(() => { setSaved(''); onDone() }, 1800)
-    } catch { alert('Failed to publish after-event content') }
-    setSaving(false)
-  }
-
-  return (
-    <div className="bg-white border border-indigo-100 rounded-2xl shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-        <div>
-          <h3 className="font-semibold text-gray-900 text-sm">{event.title}</h3>
-          <p className="text-xs text-gray-400 mt-0.5">{event.venue} · Event #{event.id}</p>
+          {/* AVG SUCCESS SCORE */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-32 transition hover:shadow-md">
+            <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Avg Success Score</div>
+            <div className="flex justify-between items-end">
+              <div className="text-4xl font-black text-slate-800">8.4 <span className="text-lg text-slate-400 font-bold">/ 10</span></div>
+              <div className="text-2xl text-amber-400">⭐</div>
+            </div>
+          </div>
         </div>
-        <span className={`text-xs font-bold px-2.5 py-1 rounded-full
-          ${event.phase === 'live' ? 'bg-red-100 text-red-700'
-          : event.phase === 'after' ? 'bg-gray-100 text-gray-600'
-          : 'bg-green-100 text-green-700'}`}>
-          {event.phase === 'live' ? '🔴 Live' : event.phase === 'after' ? '✅ Ended' : '⏳ Before'}
-        </span>
-      </div>
 
-      {/* Sub-tabs */}
-      <div className="flex border-b border-gray-100">
-        {[
-          { id: 'live',  label: '📡 Live Controls' },
-          { id: 'after', label: '🏆 After Event' },
-        ].map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)}
-            className={`flex-1 py-2.5 text-xs font-semibold transition
-              ${tab === t.id ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}>
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="px-5 py-4 space-y-4">
-        {saved && (
-          <div className="bg-green-50 text-green-700 border border-green-200 rounded-xl
-            px-3 py-2 text-xs font-semibold text-center">
-            {saved}
+        {/* Middle Row: Food & Venue */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* FOOD MANAGEMENT */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider mb-5 flex items-center gap-2">
+              <span className="text-indigo-600 text-base">🍴</span> FOOD MANAGEMENT (LIVE COUNTS)
+            </h3>
+            <div className="space-y-3">
+              {/* Item 1 */}
+              <div className="border border-slate-100 rounded-2xl p-4 flex justify-between items-center bg-white shadow-sm hover:border-indigo-100 transition cursor-default">
+                <div className="flex items-center gap-4">
+                  <span className="text-xl">🥗</span>
+                  <div>
+                    <div className="font-bold text-sm text-slate-800">Vegetarian</div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">Selected by attendees at registration</div>
+                  </div>
+                </div>
+                <div className="text-lg font-black text-indigo-700">181</div>
+              </div>
+              {/* Item 2 */}
+              <div className="border border-slate-100 rounded-2xl p-4 flex justify-between items-center bg-white shadow-sm hover:border-indigo-100 transition cursor-default">
+                <div className="flex items-center gap-4">
+                  <span className="text-xl">🍗</span>
+                  <div>
+                    <div className="font-bold text-sm text-slate-800">Non-vegetarian</div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">Chicken / Egg options selected</div>
+                  </div>
+                </div>
+                <div className="text-lg font-black text-indigo-700">88</div>
+              </div>
+              {/* Item 3 */}
+              <div className="border border-slate-100 rounded-2xl p-4 flex justify-between items-center bg-white shadow-sm hover:border-indigo-100 transition cursor-default">
+                <div className="flex items-center gap-4">
+                  <span className="text-xl">🥛</span>
+                  <div>
+                    <div className="font-bold text-sm text-slate-800">Special Dietary Requirements</div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">Jain (12) + Gluten-free (10)</div>
+                  </div>
+                </div>
+                <div className="text-lg font-black text-indigo-700">22</div>
+              </div>
+            </div>
           </div>
-        )}
 
-        {tab === 'live' && (
-          <>
-            {/* Phase switcher */}
+          {/* VENUE MANAGEMENT */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider mb-5 flex items-center gap-2">
+              <span className="text-indigo-600 text-base">🏢</span> VENUE MANAGEMENT (MULTI-VENUE)
+            </h3>
+            <div className="space-y-6 mt-6">
+              {/* Item 1 */}
+              <div className="flex justify-between items-center px-2">
+                <div className="flex gap-4 items-start">
+                  <span className="text-xl">🏫</span>
+                  <div>
+                    <div className="font-bold text-sm text-slate-800">On-campus venues</div>
+                    <div className="text-[10px] text-slate-400 mt-1">Main Auditorium, Seminar hall, CS Labs</div>
+                  </div>
+                </div>
+                <div className="text-xs font-black text-emerald-600">Available</div>
+              </div>
+              {/* Item 2 */}
+              <div className="flex justify-between items-center px-2">
+                <div className="flex gap-4 items-start">
+                  <span className="text-xl">🏢</span>
+                  <div>
+                    <div className="font-bold text-sm text-slate-800">Off-campus venues</div>
+                    <div className="text-[10px] text-slate-400 mt-1">Local Hotels, Partner Co-working hubs</div>
+                  </div>
+                </div>
+                <div className="text-xs font-black text-orange-600">Bookable</div>
+              </div>
+              {/* Item 3 */}
+              <div className="flex justify-between items-center px-2">
+                <div className="flex gap-4 items-start">
+                  <span className="text-xl">🌐</span>
+                  <div>
+                    <div className="font-bold text-sm text-slate-800">Virtual / hybrid spaces</div>
+                    <div className="text-[10px] text-slate-400 mt-1">Google Meet, Zoom API integrations</div>
+                  </div>
+                </div>
+                <div className="text-xs font-black text-indigo-700">Online API</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          {/* QR CHECK-IN */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+              <span className="text-indigo-600 text-base">📷</span> QR CHECK-IN & ATTENDANCE SCANNER
+            </h3>
+            <p className="text-[10px] text-slate-400 mt-1 mb-5">Auto-generated QR per attendee. Simulates scanning entries to mark live attendance and award points.</p>
+            
+            {/* Camera block */}
+            <div className="bg-white border-2 border-slate-100 rounded-3xl h-64 flex items-center justify-center relative overflow-hidden mb-6 shadow-inner">
+              <div className="text-center">
+                <div className="text-4xl mb-2 text-slate-300 font-mono tracking-[0.3em] font-black">O:O</div>
+                <div className="text-xs font-black tracking-[0.2em] text-emerald-500 uppercase">Simulating Web Cam</div>
+                <div className="text-4xl mt-2 text-slate-300 font-mono tracking-[0.3em] font-black">O:C</div>
+              </div>
+              {/* Green scan line */}
+              <div className="absolute left-0 right-0 h-[2px] bg-emerald-400 shadow-[0_0_12px_3px_rgba(52,211,153,0.8)] top-1/2 animate-[scan_3s_ease-in-out_infinite]"></div>
+            </div>
+
+            <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-3">Simulate Check-in Quick Actions</div>
+            <div className="space-y-2">
+              {/* Item 1 */}
+              <div className="flex justify-between items-center py-1">
+                <div className="text-xs font-bold text-slate-700">HackIndia 2026 — Build with AI</div>
+                <button className="bg-indigo-600 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition">Simulate Scan Check-in</button>
+              </div>
+              {/* Item 2 */}
+              <div className="flex justify-between items-center py-1">
+                <div className="text-xs font-bold text-slate-700">Diwali Cultural Fest</div>
+                <div className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-4 py-2 rounded-lg">✓ Checked-In</div>
+              </div>
+              {/* Item 3 */}
+              <div className="flex justify-between items-center py-1">
+                <div className="text-xs font-bold text-slate-700">GDG Cloud Study Jam</div>
+                <button className="bg-indigo-600 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition">Simulate Scan Check-in</button>
+              </div>
+              {/* Item 4 */}
+              <div className="flex justify-between items-center py-1">
+                <div className="text-xs font-bold text-slate-700">Devfolio Open Hack</div>
+                <button className="bg-indigo-600 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition">Simulate Scan Check-in</button>
+              </div>
+              {/* Item 5 */}
+              <div className="flex justify-between items-center py-1">
+                <div className="text-xs font-bold text-slate-700">AI/ML Workshop — Generative AI Fundamentals</div>
+                <button className="bg-indigo-600 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition">Simulate Scan Check-in</button>
+              </div>
+              {/* Item 6 */}
+              <div className="flex justify-between items-center py-1">
+                <div className="text-xs font-bold text-slate-700">Career Fair 2026 — Top 50 Companies</div>
+                <button className="bg-indigo-600 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition">Simulate Scan Check-in</button>
+              </div>
+            </div>
+          </div>
+
+          {/* CERTIFICATE APPROVAL */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1.5">Event Phase</label>
-              <div className="flex gap-2">
-                {['before','live','after'].map(p => (
-                  <button key={p} type="button"
-                    onClick={() => setLive(l => ({ ...l, phase: p }))}
-                    className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition
-                      ${live.phase === p
-                        ? 'bg-indigo-600 text-white border-indigo-600'
-                        : 'border-gray-200 text-gray-600 hover:border-indigo-300'}`}>
-                    {p === 'before' ? '⏳ Before' : p === 'live' ? '🔴 Live' : '✅ After'}
-                  </button>
+              <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                <span className="text-indigo-600 text-base">🏅</span> CERTIFICATE APPROVAL QUEUE
+              </h3>
+              <p className="text-[10px] text-slate-400 mt-1 mb-6">Review and approve certificates for checked-in event attendees and external uploads.</p>
+              
+              <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-3">Event Attendance Certificates</div>
+              <div className="space-y-4 mb-8">
+                {[
+                  { title: 'HackIndia 2026 — Build with AI', checked: false, primary: false },
+                  { title: 'Diwali Cultural Fest', checked: true, primary: true },
+                  { title: 'GDG Cloud Study Jam', checked: false, primary: false },
+                  { title: 'Devfolio Open Hack', checked: false, primary: false },
+                  { title: 'AI/ML Workshop — Generative AI Fundamentals', checked: false, primary: false },
+                  { title: 'Career Fair 2026 — Top 50 Companies', checked: false, primary: false },
+                ].map((c, i) => (
+                  <div key={i} className="flex justify-between items-center">
+                    <div>
+                      <div className="text-xs font-bold text-slate-700">{c.title}</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">Checked-in: {c.checked ? 'Yes' : 'No'}</div>
+                    </div>
+                    <button className={`text-[10px] font-bold px-4 py-2 rounded-lg transition ${
+                      c.primary ? 'bg-indigo-600 text-white shadow-md hover:bg-indigo-700' : 'bg-slate-50 text-slate-500 border border-slate-200 hover:bg-slate-100'
+                    }`}>
+                      Approve Issuance
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Current Session</label>
-                <input value={live.current_session}
-                  onChange={e => setLive(l => ({ ...l, current_session: e.target.value }))}
-                  placeholder="ML Hands-On Lab"
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs
-                    focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Next Session</label>
-                <input value={live.next_session}
-                  onChange={e => setLive(l => ({ ...l, next_session: e.target.value }))}
-                  placeholder="Career Panel"
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs
-                    focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            <div>
+              <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-3">External Proof Links</div>
+              <div className="border border-yellow-200 bg-yellow-50/50 rounded-2xl p-5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 bg-yellow-100 text-yellow-700 text-[10px] font-black px-3 py-1.5 rounded-bl-xl tracking-wider">PENDING</div>
+                <div className="text-xs font-black text-slate-800 mb-1.5">React Advanced Placement</div>
+                <div className="text-[10px] text-slate-500 mb-3">Student: Rahul Sen (Information Technology)</div>
+                <div className="flex justify-between items-center">
+                  <a href="#" className="text-[10px] font-semibold text-indigo-600 hover:underline">Verify Link →</a>
+                  <div className="flex gap-2">
+                    <button className="text-[10px] font-bold text-red-600 hover:text-red-700 px-2">Reject</button>
+                    <button className="bg-emerald-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-lg shadow-sm hover:bg-emerald-700 transition">Approve</button>
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">📢 Announcement</label>
-              <input value={live.announcement}
-                onChange={e => setLive(l => ({ ...l, announcement: e.target.value }))}
-                placeholder="Lunch break in Room 101..."
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">📊 Live Poll Question</label>
-              <input value={live.poll_question}
-                onChange={e => setLive(l => ({ ...l, poll_question: e.target.value }))}
-                placeholder="Which topic interests you most?"
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-2" />
-              <label className="block text-xs font-medium text-gray-500 mb-1">
-                Poll Options (one per line)
-              </label>
-              <textarea value={live.poll_options}
-                onChange={e => setLive(l => ({ ...l, poll_options: e.target.value }))}
-                placeholder={"AI / ML\nWeb Development\nCybersecurity"}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400 h-20 resize-none" />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">👥 Live Attendance Count</label>
-              <input type="number" value={live.live_count}
-                onChange={e => setLive(l => ({ ...l, live_count: e.target.value }))}
-                className="w-32 border border-gray-200 rounded-xl px-3 py-2 text-xs
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            </div>
-
-            <button onClick={saveLive} disabled={saving}
-              className="w-full bg-red-600 text-white rounded-xl py-2.5 text-xs
-                font-bold hover:bg-red-700 transition disabled:opacity-50">
-              {saving ? 'Saving...' : '🔴 Push Live Update'}
-            </button>
-          </>
-        )}
-
-        {tab === 'after' && (
-          <>
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
-                Final Attendance Count
-              </label>
-              <input type="number" value={after.final_count}
-                onChange={e => setAfter(a => ({ ...a, final_count: e.target.value }))}
-                placeholder="432"
-                className="w-32 border border-gray-200 rounded-xl px-3 py-2 text-xs
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            </div>
-
-            <WinnersBuilder items={after.winners}
-              onChange={v => setAfter(a => ({ ...a, winners: v }))} />
-
-            <ResourcesBuilder items={after.resources}
-              onChange={v => setAfter(a => ({ ...a, resources: v }))} />
-
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">📝 Recap</label>
-              <textarea value={after.recap}
-                onChange={e => setAfter(a => ({ ...a, recap: e.target.value }))}
-                placeholder="Write a summary of what happened..."
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400 h-20 resize-none" />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
-                📸 Photo URLs (one per line)
-              </label>
-              <textarea value={after.photos}
-                onChange={e => setAfter(a => ({ ...a, photos: e.target.value }))}
-                placeholder={"https://i.imgur.com/photo1.jpg\nhttps://i.imgur.com/photo2.jpg"}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400 h-20 resize-none" />
-            </div>
-
-            <button onClick={saveAfter} disabled={saving}
-              className="w-full bg-indigo-600 text-white rounded-xl py-2.5 text-xs
-                font-bold hover:bg-indigo-700 transition disabled:opacity-50">
-              {saving ? 'Publishing...' : '🏆 Publish After-Event Content'}
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ── Main OrganizerPortal ──────────────────────────────────────────────────
-export default function OrganizerPortal() {
-  const [events,     setEvents]     = useState([])
-  const [success,    setSuccess]    = useState('')
-  const [loading,    setLoading]    = useState(false)
-  const [activeCtrl, setActiveCtrl] = useState(null)  // event id for live controls
-  const navigate = useNavigate()
-  const userId = localStorage.getItem('user_id')
-
-  const emptyForm = {
-    title: '', description: '', category: 'tech', venue: '',
-    datetime: '', why_it_matters: '',
-    // Rich fields
-    event_type: 'campus', eligibility: '', required_skills: [],
-    expected_audience: '', prizes: '', registration_link: '',
-    agenda: [], tags: [],
-  }
-  const [form, setForm] = useState(emptyForm)
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
-
-  const loadEvents = async () => {
-    try {
-      // Load events by this organizer
-      const res = await axios.get(`${API}/events/organizer/${userId}`)
-      setEvents(res.data)
-    } catch {
-      // Fallback: load all events
-      try {
-        const res = await axios.get(`${API}/events`)
-        setEvents(res.data.filter(e => e.organizer_id === userId))
-      } catch {}
-    }
-  }
-
-  useEffect(() => { loadEvents() }, [])
-
-  const submit = async () => {
-    if (!form.title || !form.description || !form.venue || !form.datetime)
-      return alert('Please fill all required fields')
-    setLoading(true)
-    try {
-      await axios.post(`${API}/events`, {
-        ...form,
-        organizer_id:      userId,
-        expected_audience: parseInt(form.expected_audience) || 0,
-      })
-      setSuccess('Event published successfully! ✅')
-      setForm(emptyForm)
-      loadEvents()
-      setTimeout(() => setSuccess(''), 3000)
-    } catch {
-      alert('Failed to create event — is the backend running?')
-    }
-    setLoading(false)
-  }
-
-  return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">📋 Organizer Portal</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-        {/* ── Create Event Form ── */}
-        <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <h2 className="font-semibold text-lg mb-5">Create New Event</h2>
-
-            {success && (
-              <div className="mb-4 bg-green-50 border border-green-200 text-green-700
-                px-4 py-3 rounded-xl text-sm font-medium">
-                {success}
-              </div>
-            )}
-
-            <div className="space-y-4">
-              {/* ── Basic Info (always open) ── */}
-              <Section title="Basic Info" icon="📌" defaultOpen>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Event title *</label>
-                  <input value={form.title} onChange={e => set('title', e.target.value)}
-                    placeholder="e.g. Tech Talk: AI in 2025"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm
-                      focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Description *</label>
-                  <textarea value={form.description} onChange={e => set('description', e.target.value)}
-                    placeholder="What's happening, who should attend..."
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm
-                      focus:outline-none focus:ring-2 focus:ring-indigo-400 h-24 resize-none" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Category *</label>
-                    <select value={form.category} onChange={e => set('category', e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                      {CATS.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase()+c.slice(1)}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Event Type</label>
-                    <select value={form.event_type} onChange={e => set('event_type', e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                      {EVT_TYPES.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase()+t.slice(1)}</option>)}
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Venue *</label>
-                  <input value={form.venue} onChange={e => set('venue', e.target.value)}
-                    placeholder="e.g. Main Auditorium"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm
-                      focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Date & Time *</label>
-                  <input type="datetime-local" value={form.datetime}
-                    onChange={e => set('datetime', e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm
-                      focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Why it matters</label>
-                  <input value={form.why_it_matters} onChange={e => set('why_it_matters', e.target.value)}
-                    placeholder="e.g. Resume boost + MAR points"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm
-                      focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-                </div>
-              </Section>
-
-              {/* ── Details ── */}
-              <Section title="Details & Eligibility" icon="📋">
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Eligibility</label>
-                  <input value={form.eligibility} onChange={e => set('eligibility', e.target.value)}
-                    placeholder="e.g. Open to all / 2nd year+ / CS students only"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm
-                      focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Expected Audience</label>
-                    <input type="number" value={form.expected_audience}
-                      onChange={e => set('expected_audience', e.target.value)}
-                      placeholder="200"
-                      className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Registration Link</label>
-                    <input value={form.registration_link}
-                      onChange={e => set('registration_link', e.target.value)}
-                      placeholder="https://forms.google.com/..."
-                      className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Prizes</label>
-                  <input value={form.prizes} onChange={e => set('prizes', e.target.value)}
-                    placeholder="1st: ₹10,000 | 2nd: ₹5,000 | 3rd: ₹2,000"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm
-                      focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-                </div>
-                <TagInput label="Required Skills" value={form.required_skills}
-                  onChange={v => set('required_skills', v)}
-                  placeholder="Python, ML, React… press Enter" />
-                <TagInput label="Tags" value={form.tags}
-                  onChange={v => set('tags', v)}
-                  placeholder="AI, Google, Hackathon… press Enter" />
-              </Section>
-
-              {/* ── Agenda ── */}
-              <Section title="Agenda Builder" icon="🗓">
-                <AgendaBuilder items={form.agenda} onChange={v => set('agenda', v)} />
-              </Section>
-
-              <button onClick={submit} disabled={loading}
-                className="w-full bg-indigo-600 text-white rounded-xl py-3 font-semibold
-                  hover:bg-indigo-700 transition disabled:opacity-50">
-                {loading ? 'Publishing...' : '🚀 Publish Event'}
+        {/* Third Row (Smart Notifications + Analytics) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          {/* SMART NOTIFICATIONS */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm flex flex-col">
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2 mb-1">
+              <span className="text-indigo-600 text-base">🔔</span> SMART NOTIFICATIONS (ORGANIZER BROADCASTS)
+            </h3>
+            <p className="text-[10px] text-slate-400 mb-5">Type and send notifications. These will automatically appear at the top of students' feeds as pulsing alerts.</p>
+            
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              <input type="text" placeholder="e.g. Venue changed to Hall B — only people who RSVP'd" className="flex-1 bg-white border border-slate-200 rounded-2xl px-4 py-3 text-xs focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition" />
+              <button className="bg-indigo-600 text-white text-xs font-bold px-6 py-3 rounded-2xl shadow-sm hover:bg-indigo-700 transition flex items-center justify-center gap-2 whitespace-nowrap">
+                <span>🚀</span> Broadcast
               </button>
             </div>
-          </div>
-        </div>
 
-        {/* ── Events List + Live Controls ── */}
-        <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <h2 className="font-semibold text-lg mb-4">Your Events ({events.length})</h2>
-            {events.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 text-sm">
-                No events yet — create your first one!
+            <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-3">Recent Broadcasts</div>
+            <div className="bg-white border border-slate-100 shadow-sm rounded-2xl p-4 flex justify-between items-start">
+              <div className="flex gap-3">
+                <span className="text-lg mt-0.5">📢</span>
+                <div>
+                  <div className="text-xs font-bold text-slate-700 leading-relaxed">Notice: Venue changed to Seminar Hall B for all tech workshops.</div>
+                </div>
               </div>
-            ) : (
-              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-                {events.map(e => (
-                  <div key={e.id}
-                    className="bg-gray-50 border border-gray-100 rounded-xl p-3
-                      flex items-center justify-between">
-                    <div className="flex-1 min-w-0 mr-3">
-                      <div className="font-medium text-sm text-gray-900 truncate">{e.title}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">
-                        {e.venue} · {e.rsvp_count} RSVPs ·
-                        <span className={`ml-1 font-semibold
-                          ${e.phase === 'live' ? 'text-red-600' : e.phase === 'after' ? 'text-gray-500' : 'text-green-600'}`}>
-                          {e.phase === 'live' ? '🔴 Live' : e.phase === 'after' ? '✅ Ended' : '⏳ Before'}
-                        </span>
-                      </div>
+              <div className="text-[10px] text-slate-400 whitespace-nowrap pt-1 font-medium">Just now</div>
+            </div>
+          </div>
+
+          {/* ANALYTICS DASHBOARD DETAILS */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2 mb-6">
+              <span className="text-indigo-600 text-base">📊</span> ANALYTICS DASHBOARD DETAILS
+            </h3>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4 lg:gap-6">
+              {/* Registration Funnel */}
+              <div>
+                <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-4 h-6 flex items-end">Registration Funnel</div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1.5">
+                      <span>Views</span> <span>1,200</span>
                     </div>
-                    <div className="flex gap-1.5 flex-shrink-0">
-                      <button onClick={() => navigate(`/analytics/${e.id}`)}
-                        className="text-xs px-2.5 py-1.5 rounded-lg bg-indigo-100
-                          text-indigo-700 font-semibold hover:bg-indigo-200 transition"
-                        title="Event Deep Analytics">
-                        📊
-                      </button>
-                      <button onClick={() => navigate(`/operations/${e.id}`)}
-                        className="text-xs px-2.5 py-1.5 rounded-lg bg-red-100
-                          text-red-700 font-semibold hover:bg-red-200 transition"
-                        title="Live Operations Dashboard">
-                        🚦
-                      </button>
-                      <button
-                        onClick={() => setActiveCtrl(activeCtrl === e.id ? null : e.id)}
-                        className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition
-                          ${activeCtrl === e.id
-                            ? 'bg-red-600 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                        title="Quick Phase Switcher & Live Controls">
-                        {activeCtrl === e.id ? '✕' : '⚙️'}
-                      </button>
+                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-indigo-600 w-[100%] rounded-full"></div>
                     </div>
                   </div>
-                ))}
+                  <div>
+                    <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1.5">
+                      <span>Saves</span> <span>842</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-indigo-600 w-[70%] rounded-full"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1.5">
+                      <span>RSVPs</span> <span>268</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-indigo-600 w-[30%] rounded-full"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1.5">
+                      <span>Attended</span> <span>192</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-500 w-[20%] rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
 
-          {/* Live Controls panel — shown for selected event */}
-          {activeCtrl && (() => {
-            const ev = events.find(e => e.id === activeCtrl)
-            return ev ? (
-              <LiveControls key={activeCtrl} event={ev} onDone={() => { loadEvents() }} />
-            ) : null
-          })()}
+              {/* Department Breakdown */}
+              <div>
+                <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-4 h-6 flex items-end">Department Breakdown</div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1.5 leading-tight">
+                      <span>Computer Science (CSE)</span> <span className="ml-2">32%</span>
+                    </div>
+                    <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-indigo-600 w-[32%] rounded-full"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1.5 leading-tight">
+                      <span>Information Tech (IT)</span> <span className="ml-2">22%</span>
+                    </div>
+                    <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-slate-300 w-[22%] rounded-full"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1.5 leading-tight">
+                      <span>Electronics (ECE)</span> <span className="ml-2">18%</span>
+                    </div>
+                    <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-slate-300 w-[18%] rounded-full"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1.5 leading-tight">
+                      <span>Other departments</span> <span className="ml-2">28%</span>
+                    </div>
+                    <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-slate-200 w-[28%] rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Post-Event Ratings */}
+              <div className="flex flex-col">
+                <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-4 h-6 flex items-end">Post-Event Ratings</div>
+                <div className="flex-1 space-y-2.5">
+                  <div className="flex justify-between text-xs font-semibold text-slate-700">
+                    <span>Speaker</span> <span>★ 4.8 / 5</span>
+                  </div>
+                  <div className="flex justify-between text-xs font-semibold text-slate-700">
+                    <span>Food</span> <span>★ 4.2 / 5</span>
+                  </div>
+                  <div className="flex justify-between text-xs font-semibold text-slate-700">
+                    <span>Services</span> <span>★ 4.5 / 5</span>
+                  </div>
+                  <div className="flex justify-between text-xs font-semibold text-slate-700">
+                    <span>Venue</span> <span>★ 4.6 / 5</span>
+                  </div>
+                  <div className="flex justify-between text-[11px] font-black text-slate-800 pt-3 border-t border-slate-100 mt-1">
+                    <span>Overall Score</span> <span>★ 4.6 / 5</span>
+                  </div>
+                </div>
+                
+                <button className="w-full mt-5 bg-white border border-indigo-100 text-indigo-700 text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm hover:bg-indigo-50 transition">
+                  Export Analytics Data
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+        
       </div>
+
+      {/* Custom styles for animations */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes scan {
+          0% { top: 15%; }
+          50% { top: 85%; }
+          100% { top: 15%; }
+        }
+      `}} />
     </div>
-  )
+  );
 }
