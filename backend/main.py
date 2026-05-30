@@ -134,6 +134,26 @@ def get_event(event_id: int):
         raise HTTPException(404, "Event not found")
     return event
 
+@app.get("/events/{event_id}/attendees")
+def get_event_attendees(event_id: int):
+    db = get_db()
+    rsvps = list(db.rsvps.find({"event_id": event_id}))
+    if not rsvps:
+        return []
+    
+    user_ids = [r["user_id"] for r in rsvps]
+    users = list(db.users.find({"id": {"$in": user_ids}}))
+    
+    attendees = []
+    for user in users:
+        attendees.append({
+            "id": user["id"],
+            "name": user.get("name", "Student"),
+            "department": user.get("department", "Unknown"),
+            "role": user.get("role", "student")
+        })
+    return attendees
+
 @app.post("/events")
 def create_event(req: EventCreate):
     db = get_db()
