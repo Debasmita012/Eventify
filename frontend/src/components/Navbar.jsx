@@ -23,7 +23,7 @@ export default function Navbar() {
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
         <span onClick={() => navigate('/feed')}
           className="font-bold text-indigo-600 text-lg cursor-pointer select-none">
-          ⚡ EventSync
+          ⚡ Eventify
         </span>
         <div className="flex items-center gap-1 sm:gap-3">
           {links.map(l => (

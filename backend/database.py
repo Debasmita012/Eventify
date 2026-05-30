@@ -1,6 +1,9 @@
 import os
+from dotenv import load_dotenv
 import psycopg2
 from psycopg2.extras import RealDictCursor
+
+load_dotenv()
 
 # Example: postgres://user:pass@host:port/dbname
 DATABASE_URL = os.getenv("DATABASE_URL")
