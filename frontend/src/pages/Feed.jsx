@@ -12,7 +12,6 @@ import axios from 'axios'
 import API from '../config'
 import EventCard from '../components/EventCard'
 import ChatBot from '../components/ChatBot'
-import GestureController from '../components/GestureController'
 
 
 const MOODS = [
@@ -109,133 +108,91 @@ export default function Feed() {
     setTimeout(() => setFeedback(null), ms)
   }
 
-  // ── Gesture RSVP — FIXED ─────────────────────────────────────────
-  // Bug was: alert() + sometimes event_id mismatch between URL and body
-  const handleGestureRSVP = async () => {
-    const event = events[activeCard]
-    if (!event) { showToast('⚠️ No card selected'); return }
-
-    try {
-      const res = await axios.post(
-        `${API}/rsvp`,   // Fixed! Back to original route
-        {
-          user_id: userId,          // body             ✅
-          event_id: event.id,        // body             ✅
-        }
-      )
-      if (res.data?.conflict) {
-        showToast(`⚠️ Conflict: "${res.data.conflict}" — RSVPed anyway!`, 3500)
-      } else {
-        showToast(res.data?.action === 'added' ? '✅ RSVPed!' : '🗑️ RSVP removed')
-      }
-      await fetchFeed(false)
-    } catch (e) {
-      const status = e?.response?.status
-      const detail = e?.response?.data?.detail || e.message || 'Unknown error'
-      console.error('RSVP failed:', status, detail)
-
-      if (!e?.response) {
-        showToast('❌ Backend not reachable — is uvicorn running on port 8000?', 4000)
-      } else if (status === 422) {
-        showToast('❌ Validation error (422) — check user_id in localStorage', 4000)
-      } else if (status === 404) {
-        showToast('❌ Event not found (404)', 3000)
-      } else {
-        showToast(`❌ RSVP failed: ${detail}`, 3500)
-      }
-    }
-  }
-
-  const handleGestureBookmark = async () => {
-    const event = events[activeCard]
-    if (!event) { showToast('⚠️ No card selected'); return }
-
-    try {
-      const res = await axios.post(`${API}/bookmark`, {
-        user_id: userId,
-        event_id: event.id,
-      })
-      showToast(res.data?.action === 'added' ? '⭐ Marked interested' : 'Bookmark removed')
-      await fetchFeed(false)
-    } catch (e) {
-      const detail = e?.response?.data?.detail || e.message || 'Unknown error'
-      showToast(`❌ Bookmark failed: ${detail}`, 3500)
-    }
-  }
   const handleToggleChat = () => setChatOpen(o => !o)
 
   // ═════════════════════════════════════════════════════════════════
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-5xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-transparent relative pb-20">
+      <div className="max-w-6xl mx-auto px-4 py-8 relative z-10">
 
-        {/* Greeting */}
-        <div className="mb-5">
-          <h1 className="text-xl font-bold text-gray-900">
-            Hey {name.split(' ')[0]} 👋
-          </h1>
-          <p className="text-sm text-gray-500">Your personalised campus feed</p>
+        {/* Greeting Banner */}
+        <div className="mb-10 flex flex-col md:flex-row items-center gap-6 bg-green-50 border-4 border-green-700 p-8 relative overflow-hidden shadow-sm">
+          <div className="absolute top-0 right-0 w-64 h-64 opacity-20 pointer-events-none">
+            <img src="/theme-assets/castle.png" alt="Castle" className="w-full h-full object-cover" />
+          </div>
+          <img src="/theme-assets/owl.png" alt="Owl" className="w-24 h-24 object-contain animate-bounce" style={{ animationDuration: '3s' }} />
+          <div className="text-center sm:text-left relative z-10">
+            <h1 className="text-4xl sm:text-5xl font-vt mb-2 text-shadow-sm uppercase text-slate-800">
+              Nexus Feed
+            </h1>
+            <p className="text-sm sm:text-base text-slate-700 font-outfit font-bold tracking-wide">
+              Welcome back, {name.split(' ')[0]}. Discover your next adventure.
+            </p>
+          </div>
         </div>
 
-        {/* Search */}
-        <div className="relative mb-4">
-          <span className="absolute left-4 top-3 text-gray-400 text-sm">🔍</span>
-          <input
-            className="w-full pl-10 pr-4 py-3 rounded-2xl border border-gray-200
-              bg-white shadow-sm focus:outline-none focus:ring-2
-              focus:ring-indigo-400 text-sm"
-            placeholder="Search events… try 'robotics' or 'music tonight'"
-            value={search}
-            onChange={e => { setSearch(e.target.value); handleSearch(e.target.value) }}
-          />
-        </div>
-
-        {/* Mood chips */}
-        <div className="flex gap-2 flex-wrap mb-6">
-          {MOODS.map(m => (
-            <button key={m.label} onClick={() => handleMood(m)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium
-                transition-all border
-                ${activeMood === m.label
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'}`}>
-              {m.label}
+        {/* Search Panel */}
+        <div className="mc-panel p-4 mb-8 flex flex-col sm:flex-row gap-4 items-center bg-blue-50 relative overflow-hidden">
+          <img src="/theme-assets/wand.png" alt="Magic" className="absolute -right-4 -bottom-4 w-32 h-32 opacity-10 pointer-events-none" />
+          <div className="relative w-full z-10">
+            <span className="absolute left-5 top-4 text-slate-400 text-lg">✦</span>
+            <input
+              className="w-full pl-12 pr-6 py-4 border-4 border-slate-300
+                bg-white focus:outline-none focus:border-blue-500 transition-all text-sm
+                text-slate-800 placeholder-slate-400 font-outfit font-bold"
+              placeholder="Search the nexus… try 'robotics' or 'magic'"
+              value={search}
+              onChange={e => { setSearch(e.target.value); handleSearch(e.target.value) }}
+            />
+          </div>
+          {/* Mood chips */}
+          <div className="flex gap-2 flex-wrap justify-center sm:justify-start w-full sm:w-auto shrink-0">
+            {MOODS.map(m => (
+              <button key={m.label} onClick={() => handleMood(m)}
+                className={`px-4 py-3 text-xs font-bold uppercase tracking-wider
+                  transition-all duration-100 border-2 border-b-4
+                  ${activeMood === m.label
+                    ? 'bg-blue-100 text-blue-800 border-blue-400 shadow-none translate-y-[2px] border-b-2'
+                    : 'bg-white text-slate-600 border-slate-300 hover:border-slate-400 hover:text-slate-800'}`}>
+                {m.label}
+              </button>
+            ))}
+            <button onClick={handleSurprise}
+              className={`px-4 py-3 text-xs font-bold uppercase tracking-wider border-2 border-b-4 transition-all duration-100
+                ${activeMood === '🎲 Surprise'
+                  ? 'bg-amber-100 text-amber-800 border-amber-400 shadow-none translate-y-[2px] border-b-2'
+                  : 'bg-white text-amber-600 border-slate-300 hover:border-amber-400 hover:text-amber-700'}`}>
+              ✧ Surprise
             </button>
-          ))}
-          <button onClick={handleSurprise}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all
-              ${activeMood === '🎲 Surprise'
-                ? 'bg-orange-500 text-white border-orange-500'
-                : 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100'}`}>
-            🎲 Surprise me
-          </button>
-          {activeMood && (
-            <button onClick={resetFeed}
-              className="px-3 py-1.5 rounded-full text-xs text-gray-400
-                hover:text-gray-600 border border-transparent">
-              × Reset
-            </button>
-          )}
+            {activeMood && (
+              <button onClick={resetFeed}
+                className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border-2 border-b-4 border-slate-300
+                  hover:text-red-600 hover:border-red-400 transition-colors">
+                ✕ Reset
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Event grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-64 bg-gray-200 rounded-2xl animate-pulse" />
+              <div key={i} className="h-80 bg-slate-200/80 border-4 border-slate-300 animate-pulse" />
             ))}
           </div>
         ) : events.length === 0 ? (
-          <div className="text-center py-20 text-gray-400">
-            <div className="text-4xl mb-2">🔍</div>
-            <p className="text-sm">No events found. Try a different search.</p>
+          <div className="text-center py-32 text-slate-500 font-outfit mc-panel bg-amber-50">
+            <img src="/theme-assets/chest.png" alt="Empty" className="w-24 h-24 mx-auto mb-4 opacity-50 grayscale" />
+            <p className="text-lg uppercase tracking-widest font-bold">The treasure vault is empty.</p>
+            <p className="text-xs mt-2 text-slate-600">Try adjusting your magical search frequencies.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((e, idx) => (
               <div key={e.id}
-                className={`transition-all duration-300 ${idx === activeCard
-                  ? 'ring-2 ring-indigo-500 ring-offset-2 rounded-2xl' : ''}`}>
+                className={`transition-all duration-500 ${idx === activeCard
+                  ? 'scale-[1.02] z-10' : ''}`}>
                 <EventCard
                   event={e}
                   isRsvpd={rsvpdIds.has(e.id)}
@@ -249,25 +206,16 @@ export default function Feed() {
         )}
       </div>
 
-      {/* ── Inline toast (no more alert() popups) ── */}
+      {/* ── Inline toast ── */}
       {feedback && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999]
-          bg-gray-900 text-white text-sm font-semibold px-5 py-3
-          rounded-2xl shadow-2xl pointer-events-none">
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[9999]
+          bg-green-500 border-4 border-green-700 text-white text-sm font-bold uppercase tracking-widest px-6 py-4
+          shadow-[4px_4px_0_rgba(0,0,0,0.2)] pointer-events-none animate-in slide-in-from-top-4 fade-in duration-300">
           {feedback}
         </div>
       )}
 
       <ChatBot forceOpen={chatOpen} onToggle={handleToggleChat} />
-
-      <GestureController
-        events={events}
-        activeCard={activeCard}
-        setActiveCard={setActiveCard}
-        onRSVP={handleGestureRSVP}
-        onBookmark={handleGestureBookmark}
-        onToggleChat={handleToggleChat}
-      />
     </div>
   )
 }

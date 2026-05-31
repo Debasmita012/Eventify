@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API from '../config'
-import QRCode from 'react-qr-code'
 
 const CAT_COLORS = {
   tech: 'bg-blue-100 text-blue-700',
@@ -19,7 +18,6 @@ export default function EventCard({ event, isRsvpd = false, isBookmarked = false
   const [bookmarked, setBookmarked] = useState(isBookmarked)
   const [count, setCount] = useState(event.rsvp_count)
   const [loadRsvp, setLoadRsvp] = useState(false)
-  const [showQR, setShowQR] = useState(false)
   const navigate = useNavigate()
   const userId = localStorage.getItem('user_id')
   const trending = count > 100
@@ -67,111 +65,91 @@ export default function EventCard({ event, isRsvpd = false, isBookmarked = false
   return (
     <div
       onClick={() => navigate(`/event/${event.id}`)}
-      className={`bg-white rounded-2xl border ${isActive ? 'border-indigo-500 shadow-indigo-100' : 'border-gray-100'} overflow-hidden
-        cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all group`}
-      style={isActive ? { boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.4)' } : {}}
+      className={`mc-card overflow-hidden relative group cursor-pointer ${isActive ? 'border-green-400 shadow-[4px_4px_0_rgba(74,222,128,0.5)]' : ''}`}
+      style={isActive ? { transform: 'scale(1.02)' } : {}}
     >
+      {/* Decorative gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 z-10 pointer-events-none"></div>
 
       {/* Image */}
       {event.image_url && (
-        <div className="h-36 overflow-hidden relative">
+        <div className="h-48 overflow-hidden relative border-b-4 border-slate-300">
           <img src={event.image_url} alt={event.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
           {trending && (
-            <span className="absolute top-2 left-2 bg-orange-500 text-white
-              text-xs font-semibold px-2 py-0.5 rounded-full">
+            <span className="absolute top-3 left-3 bg-amber-500 text-white border-2 border-b-4 border-amber-700
+              text-[10px] uppercase tracking-widest font-bold px-3 py-1 z-20">
               🔥 Trending
             </span>
           )}
           <button onClick={handleBookmark}
-            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/80
-              flex items-center justify-center text-sm hover:bg-white transition">
+            className="absolute top-3 right-3 w-8 h-8 bg-white border-2 border-b-4 border-slate-300
+              flex items-center justify-center text-sm hover:border-slate-400 hover:text-red-500 transition-all z-20 active:translate-y-[2px] active:border-b-2">
             {bookmarked ? '🔖' : '🤍'}
           </button>
         </div>
       )}
 
-      <div className="p-4">
+      <div className="p-5 relative z-20">
         {/* Category + venue */}
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <span className={`text-xs font-medium px-2 py-0.5 rounded-full
-            ${CAT_COLORS[event.category] || 'bg-gray-100 text-gray-600'}`}>
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <span className={`text-[10px] uppercase font-bold tracking-widest px-3 py-1 border-2 border-b-4
+            ${CAT_COLORS[event.category] || 'bg-slate-100 border-slate-300 text-slate-700'}`}>
             {event.category}
           </span>
-          <span className="text-xs text-gray-400 truncate">{event.venue}</span>
+          <span className="text-[10px] text-slate-600 font-bold truncate uppercase tracking-widest bg-slate-100 px-3 py-1 border-2 border-slate-300">{event.venue}</span>
         </div>
 
         {/* Title */}
-        <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1 text-sm">
+        <h3 className="font-vt font-bold text-slate-800 text-2xl mb-2 line-clamp-1 group-hover:text-green-600 transition-colors">
           {event.title}
         </h3>
 
         {/* Why it matters */}
         {event.why_it_matters && (
-          <p className="text-xs text-indigo-600 font-medium mb-2">
-            ✨ {event.why_it_matters}
+          <p className="text-xs text-slate-500 font-bold mb-3 italic">
+            ✧ {event.why_it_matters}
           </p>
         )}
 
         {/* Date */}
-        <p className="text-xs text-gray-400 mb-3">
-          📅 {date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-          &nbsp;🕐 {date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+        <p className="text-[10px] text-slate-500 font-outfit font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+          <span className="text-green-500">📅</span> {date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+          <span className="text-green-500 ml-2">🕐</span> {date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
         </p>
 
         {/* Social proof */}
-        <div className="flex items-center gap-2 mb-3">
-          <div className="flex -space-x-1">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex -space-x-2">
             {avatars.map((url, i) => (
               <img key={i} src={url}
-                className="w-5 h-5 rounded-full border border-white" />
+                className="w-6 h-6 border-2 border-slate-300 rounded-none shadow-sm" />
             ))}
           </div>
-          <span className="text-xs text-gray-500">{count} going</span>
+          <span className="text-xs text-slate-400 font-outfit font-bold tracking-wider">{count} ATND</span>
         </div>
 
         {/* Actions */}
         <div className="flex gap-2">
           {rsvpd ? (
-            <>
-              <button onClick={handleRSVP} disabled={loadRsvp}
-                className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all bg-green-500 text-white">
-                {loadRsvp ? '...' : '✓ Booked'}
-              </button>
-              <button onClick={(e) => { e.stopPropagation(); setShowQR(true); }}
-                className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all bg-purple-600 text-white hover:bg-purple-700">
-                🎫 QR Code
-              </button>
-            </>
+            <button onClick={handleRSVP} disabled={loadRsvp}
+              className="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest transition-all 
+                bg-green-100 text-green-700 border-2 border-b-4 border-green-300 hover:border-green-400 active:translate-y-[2px] active:border-b-2">
+              {loadRsvp ? '...' : '✓ Booked'}
+            </button>
           ) : (
             <button onClick={handleRSVP} disabled={loadRsvp}
-              className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all bg-indigo-600 text-white hover:bg-indigo-700">
-              {loadRsvp ? '...' : 'RSVP'}
+              className="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest transition-all mc-btn flex items-center justify-center gap-2">
+              {loadRsvp ? '...' : <><img src="/theme-assets/pickaxe.png" className="w-4 h-4" alt="Pickaxe" /> RSVP Now</>}
             </button>
           )}
           <button onClick={handleExport}
-            className="px-3 py-2 rounded-xl border border-gray-200
-              text-gray-500 text-xs hover:bg-gray-50 transition">
-            📅
+            className="w-10 flex items-center justify-center text-sm
+              bg-slate-200 border-2 border-b-4 border-slate-400 text-slate-600 hover:border-slate-500 hover:text-slate-800 active:translate-y-[2px] active:border-b-2">
+            ⬇️
           </button>
         </div>
       </div>
-
-      {/* QR Modal Overlay */}
-      {showQR && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={(e) => { e.stopPropagation(); setShowQR(false); }}>
-          <div className="bg-white p-6 rounded-2xl shadow-xl max-w-sm w-full text-center" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-bold mb-2">Event Ticket</h3>
-            <p className="text-gray-500 text-sm mb-6">Scan this code for entry to {event.title}</p>
-            <div className="bg-white p-4 inline-block rounded-xl shadow-inner border border-gray-100 mb-6">
-              <QRCode value={`eventify:user_${userId}:event_${event.id}`} size={200} />
-            </div>
-            <button onClick={() => setShowQR(false)} className="w-full bg-gray-900 text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition">
-              Close Ticket
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

@@ -1,11 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import axios from 'axios'
 import API from '../config'
 import Confetti from 'react-confetti'
 import { useWindowSize } from 'react-use'
-import QRCode from 'react-qr-code'
-
 // ── Constants ─────────────────────────────────────────────────────────────
 const CAT_COLORS = {
   tech:     'bg-blue-500/20 text-blue-300 border border-blue-500/30',
@@ -40,7 +38,6 @@ export default function EventDetail() {
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('overview')
   const [showConfetti, setShowConfetti] = useState(false)
-  const [showQR, setShowQR] = useState(false)
   const [viewMode, setViewMode] = useState('public') // 'public' | 'organizer'
 
   // Sub-modules state
@@ -773,14 +770,14 @@ export default function EventDetail() {
 
   if (!event) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0f172a] text-slate-100 font-bold text-xl">
-        Loading Event Details...
+      <div className="min-h-screen flex items-center justify-center bg-transparent text-slate-800 font-vt text-4xl uppercase tracking-widest text-shadow-sm animate-pulse">
+        Initializing...
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-slate-100 pb-20 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-transparent text-slate-800 pb-20 relative overflow-hidden font-outfit">
       
       {/* Organizer View Toggle */}
       {(userRole === 'organizer' || userRole === 'admin') && (
@@ -805,30 +802,31 @@ export default function EventDetail() {
       <div className="absolute bottom-[20%] right-[-10%] w-96 h-96 bg-purple-500/10 rounded-full blur-[100px]" />
 
       {/* ── SCREENSHOT 1 STYLED HEADER NAVBAR ───────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-900 px-6 py-4 flex items-center justify-between">
+      <header className="relative z-30 bg-white border-4 border-slate-300 px-6 py-4 mt-8 flex flex-col lg:flex-row lg:items-center justify-between gap-4 mc-panel shadow-sm mx-4 lg:mx-0">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-lg text-white shadow-lg shadow-indigo-500/20">
+          <div className="w-12 h-12 bg-green-500 border-2 border-b-4 border-green-700 flex items-center justify-center font-black text-2xl text-white shadow-sm">
             {ET_ICONS[event.event_type] || '📌'}
           </div>
           <div>
-            <div className="font-black text-white text-base leading-tight tracking-tight uppercase">{event.title}</div>
-            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{event.category} - Operating System</div>
+            <div className="font-vt font-black text-slate-800 text-3xl leading-tight tracking-widest uppercase text-shadow-sm">{event.title}</div>
+            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest font-outfit">{event.category} - Operating System</div>
           </div>
         </div>
 
         {/* Horizontal Navigation List (Screenshot 1: About, Problems, Events, Timeline...) */}
-        <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-400">
-          <button onClick={() => document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-indigo-400 transition">About</button>
+        <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-500">
+          <button onClick={() => document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-green-600 transition">About</button>
           
           {event.event_type === 'hackathon' && (
-            <button onClick={() => document.getElementById('problems-section')?.scrollIntoView({ behavior: 'smooth' })} className="bg-slate-800 text-indigo-400 border border-slate-700 px-3 py-1 rounded-full hover:bg-slate-700 transition">Problems</button>
+            <button onClick={() => document.getElementById('problems-section')?.scrollIntoView({ behavior: 'smooth' })} className="bg-slate-200 text-slate-700 border-2 border-slate-300 border-b-4 px-3 py-1 hover:bg-slate-300 active:translate-y-[2px] active:border-b-2 transition">Problems</button>
           )}
 
-          <button onClick={() => document.getElementById('prizes-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-indigo-400 transition">Prizes</button>
-          <button onClick={() => document.getElementById('schedule-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-indigo-400 transition">Timeline</button>
-          <button onClick={() => document.getElementById('dashboard-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-indigo-400 transition">Dashboard</button>
-          <button onClick={() => document.getElementById('food-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-indigo-400 transition">Food Court</button>
-          <button onClick={() => document.getElementById('helpdesk-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-indigo-400 transition">Contact Us / Support</button>
+          <button onClick={() => document.getElementById('prizes-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-green-600 transition">Prizes</button>
+          <button onClick={() => document.getElementById('schedule-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-green-600 transition">Timeline</button>
+          <button onClick={() => document.getElementById('dashboard-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-green-600 transition">Dashboard</button>
+          <button onClick={() => document.getElementById('buddies-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-green-600 transition">Buddies</button>
+          <button onClick={() => document.getElementById('food-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-green-600 transition">Food Court</button>
+          <button onClick={() => document.getElementById('helpdesk-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-green-600 transition">Contact Us / Support</button>
           
           {event.phase === 'after' ? (
             <button onClick={handleDownloadCertificate} className="bg-amber-600/90 text-white px-3 py-1 rounded-full hover:bg-amber-600 transition flex items-center gap-1 border border-amber-400/20">
@@ -881,45 +879,53 @@ export default function EventDetail() {
         
 
         {/* ── TAB PORTALS ─────────────────────────────────────────────────── */}
-        <div className="bg-slate-900/40 border border-slate-900 rounded-3xl p-6 backdrop-blur-md">
+        <div className="p-2 md:p-6">
 
           {/* 1. OVERVIEW TAB (Screenshot 2 / 3 details: description, venue highlight, rules, Accordion FAQs) */}
           <div id="about-section" className="py-20 max-w-7xl mx-auto scroll-mt-24">
             <div className="space-y-8">
               
-              {/* Description Card (Screenshot 2 style) */}
-              <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl space-y-4">
-                <p className="text-indigo-400 font-bold text-xs uppercase tracking-widest">CODE. CREATE. CONQUER.</p>
-                
-                <h2 className="text-2xl font-black text-white">{event.title} 2.0</h2>
-                
-                <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-line">
-                  {event.description || `${event.title} is where ambition meets opportunity. Compete for massive cash prizes, cool goodies and some Swag Se Swagat. Most importantly, unlock unparalleled networking by connecting directly with industry experts, gain insights, and showcase your talent!`}
-                </p>
+              {/* About Section Header - Title ONLY, NO IMAGE */}
+              <div className="relative flex items-center justify-center w-full max-w-4xl mx-auto mb-8">
+                <h2 className="text-4xl md:text-6xl font-vt font-black text-slate-900 text-shadow-sm uppercase text-center">
+                  {event.title}
+                </h2>
+              </div>
 
-                {/* Styled Explicit Venue Section (Screenshot 2 style) */}
-                <div className="border-t border-slate-800 pt-4 mt-2">
-                  <div className="text-sm font-bold text-slate-200 flex items-center gap-1.5">
-                    <span>📍 Venue -</span> 
-                    <span className="text-blue-400">{event.venue || 'SMCC Building, Jadavpur University, Salt Lake Campus'}</span>
-                  </div>
-                </div>
-
-                {/* Rules & Code of Conduct link (Screenshot 2 style) */}
-                <div className="pt-2">
-                  <h4 className="font-bold text-slate-200 text-sm">Rules</h4>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Follow the <a href="#rules" onClick={() => alert('Code of Conduct loaded: Be respectful, follow specifications, and cooperate with organizers.')} className="text-blue-400 hover:underline font-bold">Code of Conduct</a>.
+              {/* Description Content Card */}
+              <div className="mc-panel bg-white border-4 border-slate-300 p-8 md:p-12 space-y-4 max-w-4xl mx-auto relative overflow-hidden shadow-sm z-10">
+                <p className="text-indigo-500 font-black text-sm uppercase tracking-widest text-center mb-8 font-outfit">CODE. CREATE. CONQUER.</p>
+                
+                <div className="relative z-10 text-slate-800 w-full font-outfit">
+                  <p className="text-slate-800 text-base md:text-lg leading-relaxed whitespace-pre-line font-bold mb-8">
+                    {event.description || `${event.title} is where ambition meets opportunity. Compete for massive cash prizes, cool goodies and some Swag Se Swagat. Most importantly, unlock unparalleled networking by connecting directly with industry experts, gain insights, and showcase your talent!`}
                   </p>
-                </div>
 
-                {/* Social Share links (Screenshot 2 style) */}
-                <div className="pt-2">
-                  <h4 className="font-bold text-slate-300 text-[10px] uppercase tracking-wider mb-2">Find us on</h4>
-                  <div className="flex gap-2">
-                    <button onClick={() => alert('Devfolio registration linked! 🚀')} className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg transition">Devfolio</button>
-                    <button onClick={() => alert('Platform discord group linked!')} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg transition">Discord</button>
-                    <button onClick={() => alert('Linked sharing triggered')} className="bg-sky-600 hover:bg-sky-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg transition">LinkedIn</button>
+                  {/* Styled Explicit Venue Section */}
+                  <div className="border-t-4 border-slate-200 border-dashed pt-8 mt-8">
+                    <div className="text-base font-black text-slate-800 flex items-center flex-wrap gap-3">
+                      <span className="text-2xl">📍</span> 
+                      <span className="uppercase tracking-widest text-slate-500">Venue -</span> 
+                      <span className="text-indigo-700 bg-indigo-50 px-4 py-1.5 border-2 border-indigo-200">{event.venue || 'SMCC Building, Jadavpur University, Salt Lake Campus'}</span>
+                    </div>
+                  </div>
+
+                  {/* Rules & Code of Conduct link */}
+                  <div className="pt-8">
+                    <h4 className="font-black text-slate-900 text-base uppercase tracking-widest">Rules & Guidelines</h4>
+                    <p className="text-sm text-slate-600 mt-2 font-bold">
+                      Follow the <a href="#rules" onClick={() => alert('Code of Conduct loaded: Be respectful, follow specifications, and cooperate with organizers.')} className="text-indigo-600 hover:text-indigo-800 hover:underline">Code of Conduct</a>.
+                    </p>
+                  </div>
+
+                  {/* Social Share links */}
+                  <div className="pt-10">
+                    <h4 className="font-black text-slate-500 text-xs uppercase tracking-widest mb-4">Share or Find us on</h4>
+                    <div className="flex flex-wrap gap-4">
+                      <button onClick={() => alert('Devfolio registration linked! 🚀')} className="mc-btn px-6 py-3 text-xs">Devfolio</button>
+                      <button onClick={() => alert('Platform discord group linked!')} className="mc-btn px-6 py-3 text-xs bg-indigo-100 text-indigo-700 border-indigo-300 hover:bg-indigo-200 hover:border-indigo-400">Discord</button>
+                      <button onClick={() => alert('Linked sharing triggered')} className="mc-btn px-6 py-3 text-xs bg-sky-100 text-sky-700 border-sky-300 hover:bg-sky-200 hover:border-sky-400">LinkedIn</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -927,7 +933,7 @@ export default function EventDetail() {
               {/* Category Specific Problems Deck (Screenshot 1 "Problems" link target) */}
               {event.event_type === 'hackathon' && (
                 <div className="bg-gradient-to-br from-indigo-950/20 to-slate-900 border border-indigo-500/20 p-6 rounded-3xl space-y-4 shadow-xl scroll-mt-24" id="problems-section">
-                  <h3 className="font-black text-white text-base flex items-center gap-2">
+                  <h3 className="font-black text-slate-900 text-base flex items-center gap-2">
                     <span>💻</span> HACKATHON PROBLEMS & TRACKS
                   </h3>
                   <div className="flex gap-2 items-center mt-2">
@@ -945,14 +951,14 @@ export default function EventDetail() {
                   
                   {event.specifics?.hackathon_problem_statements ? (
                     <div className="space-y-4">
-                      <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                        <div className="text-slate-400 text-xs font-bold uppercase mb-1">Problem Statement</div>
-                        <p className="text-xs text-slate-200 leading-relaxed italic">{event.specifics.hackathon_problem_statements}</p>
+                      <div className="mc-panel bg-white border-4 border-slate-200 p-4 rounded-xl border border-slate-300">
+                        <div className="text-slate-600 text-xs font-bold uppercase mb-1">Problem Statement</div>
+                        <p className="text-xs text-slate-800 leading-relaxed italic">{event.specifics.hackathon_problem_statements}</p>
                       </div>
 
                       {event.specifics.hackathon_tracks && (
                         <div>
-                          <div className="text-slate-400 text-xs font-bold uppercase mb-1.5">Problem Tracks</div>
+                          <div className="text-slate-600 text-xs font-bold uppercase mb-1.5">Problem Tracks</div>
                           <div className="flex flex-wrap gap-2">
                             {event.specifics.hackathon_tracks.map(t => (
                               <span key={t} className="bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-xs px-3 py-1 rounded-full font-bold">
@@ -964,7 +970,7 @@ export default function EventDetail() {
                       )}
                     </div>
                   ) : (
-                    <div className="text-xs text-slate-400">
+                    <div className="text-xs text-slate-600">
                       Problem statements will release at keynote launch. Stay tuned to live dashboard announcements!
                     </div>
                   )}
@@ -973,54 +979,54 @@ export default function EventDetail() {
 
               {/* Accordion FAQ Block (Screenshot 3 style) */}
               <div className="space-y-4">
-                <h3 className="text-lg font-black text-white flex items-center gap-2">
+                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
                   <span>❓</span> FAQ & General Queries
                 </h3>
 
                 <div className="space-y-3">
                   {/* Item 1 */}
-                  <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden transition">
+                  <div className="mc-panel bg-white border border-slate-300 rounded-2xl overflow-hidden transition">
                     <button 
                       onClick={() => toggleFAQ(0)}
-                      className="w-full px-5 py-4 flex justify-between items-center font-bold text-slate-200 text-sm hover:text-white transition"
+                      className="w-full px-5 py-4 flex justify-between items-center font-bold text-slate-800 text-sm hover:text-slate-900 transition"
                     >
                       <span>What is a hackathon?</span>
                       <span className="text-slate-500 text-lg">{expandedFAQ[0] ? '▲' : '▼'}</span>
                     </button>
                     {expandedFAQ[0] && (
-                      <div className="px-5 pb-4 text-xs text-slate-400 leading-relaxed border-t border-slate-800/40 pt-3">
+                      <div className="px-5 pb-4 text-xs text-slate-600 leading-relaxed border-t border-slate-300/40 pt-3">
                         A hackathon is a social coding event where programmers, designers, and developers collaborate to solve a problem and compete for cash prizes. It's one part party, one part work-hard overnight battle against the clock and the competition.
                       </div>
                     )}
                   </div>
 
                   {/* Item 2 */}
-                  <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden transition">
+                  <div className="mc-panel bg-white border border-slate-300 rounded-2xl overflow-hidden transition">
                     <button 
                       onClick={() => toggleFAQ(1)}
-                      className="w-full px-5 py-4 flex justify-between items-center font-bold text-slate-200 text-sm hover:text-white transition"
+                      className="w-full px-5 py-4 flex justify-between items-center font-bold text-slate-800 text-sm hover:text-slate-900 transition"
                     >
                       <span>What is {event.title}?</span>
                       <span className="text-slate-500 text-lg">{expandedFAQ[1] ? '▲' : '▼'}</span>
                     </button>
                     {expandedFAQ[1] && (
-                      <div className="px-5 pb-4 text-xs text-slate-400 leading-relaxed border-t border-slate-800/40 pt-3">
+                      <div className="px-5 pb-4 text-xs text-slate-600 leading-relaxed border-t border-slate-300/40 pt-3">
                         {event.title} is an exciting event hosted on Eventify. It's a high-energy, innovation-filled event where participants from all over come together to collaborate, learn, and showcase their skills.
                       </div>
                     )}
                   </div>
 
                   {/* Item 3 */}
-                  <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden transition">
+                  <div className="mc-panel bg-white border border-slate-300 rounded-2xl overflow-hidden transition">
                     <button 
                       onClick={() => toggleFAQ(2)}
-                      className="w-full px-5 py-4 flex justify-between items-center font-bold text-slate-200 text-sm hover:text-white transition"
+                      className="w-full px-5 py-4 flex justify-between items-center font-bold text-slate-800 text-sm hover:text-slate-900 transition"
                     >
                       <span>Who can participate?</span>
                       <span className="text-slate-500 text-lg">{expandedFAQ[2] ? '▲' : '▼'}</span>
                     </button>
                     {expandedFAQ[2] && (
-                      <div className="px-5 pb-4 text-xs text-slate-400 leading-relaxed border-t border-slate-800/40 pt-3">
+                      <div className="px-5 pb-4 text-xs text-slate-600 leading-relaxed border-t border-slate-300/40 pt-3">
                         {event.title} is open to all enthusiasts and participants! Whether you're a beginner, a professional, or just someone with great ideas, you're welcome to join and participate!
                       </div>
                     )}
@@ -1034,58 +1040,58 @@ export default function EventDetail() {
           {/* 2. PRIZES TAB */}
           <div id="prizes-section" className="py-20 max-w-7xl mx-auto scroll-mt-24">
             <div className="space-y-6">
-              <h3 className="text-lg font-black text-white flex items-center gap-2">
+              <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
                 <span>🏆</span> Prize Pool & Sponsors
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 {/* 1st prize */}
-                <div className="bg-gradient-to-br from-amber-500/20 to-slate-900 border border-amber-500/30 p-6 rounded-3xl text-center space-y-3 relative overflow-hidden">
+                <div className="mc-panel bg-amber-50 border-4 border-amber-300 p-6 text-center space-y-3 relative overflow-hidden">
                   <div className="text-4xl">🥇</div>
-                  <h4 className="font-bold text-white text-sm">FIRST PLACE CHAMPION</h4>
-                  <div className="text-3xl font-black text-amber-400">
+                  <h4 className="font-bold text-slate-900 text-sm">FIRST PLACE CHAMPION</h4>
+                  <div className="text-3xl font-black text-amber-700">
                     {event.prizes ? event.prizes.split(';')[0] || event.prizes : '₹50,000 Cash'}
                   </div>
-                  <p className="text-[10px] text-slate-400">Accredited Trophy + Premium Swag Bags</p>
+                  <p className="text-[10px] text-slate-600">Accredited Trophy + Premium Swag Bags</p>
                 </div>
 
                 {/* 2nd prize */}
-                <div className="bg-slate-800/20 border border-slate-800 p-6 rounded-3xl text-center space-y-3">
+                <div className="mc-panel bg-white border-4 border-slate-300 p-6 text-center space-y-3">
                   <div className="text-4xl">🥈</div>
-                  <h4 className="font-bold text-white text-sm">RUNNER UP</h4>
-                  <div className="text-2xl font-black text-slate-300">
+                  <h4 className="font-bold text-slate-900 text-sm">RUNNER UP</h4>
+                  <div className="text-2xl font-black text-slate-700">
                     {event.prizes ? event.prizes.split(';')[1] || '₹30,000 Cash' : '₹30,000 Cash'}
                   </div>
-                  <p className="text-[10px] text-slate-400">Trophy + Swag Bags</p>
+                  <p className="text-[10px] text-slate-600">Trophy + Swag Bags</p>
                 </div>
 
                 {/* 3rd prize */}
-                <div className="bg-slate-800/20 border border-slate-800 p-6 rounded-3xl text-center space-y-3">
+                <div className="mc-panel bg-white border-4 border-slate-300 p-6 text-center space-y-3">
                   <div className="text-4xl">🥉</div>
-                  <h4 className="font-bold text-white text-sm">THIRD PLACE</h4>
+                  <h4 className="font-bold text-slate-900 text-sm">THIRD PLACE</h4>
                   <div className="text-2xl font-black text-amber-600">
                     {event.prizes ? event.prizes.split(';')[2] || '₹15,000 Cash' : '₹15,000 Cash'}
                   </div>
-                  <p className="text-[10px] text-slate-400">Certificate + Swags</p>
+                  <p className="text-[10px] text-slate-600">Certificate + Swags</p>
                 </div>
 
               </div>
 
               {/* Sponsors Section (Screenshot 1: Sponsors list) */}
-              <div className="bg-slate-850 border border-slate-800 p-6 rounded-3xl space-y-4 mt-6">
-                <h4 className="text-sm font-black text-white uppercase tracking-wider">PLATINUM SPONSORS</h4>
+              <div className="mc-panel bg-slate-50 border-4 border-slate-300 p-6 space-y-4 mt-6">
+                <h4 className="text-sm font-black text-slate-900 uppercase tracking-wider">PLATINUM SPONSORS</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                  <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-center font-bold text-slate-400 text-xs">
+                  <div className="mc-panel bg-white border border-slate-300 p-4 rounded-2xl flex items-center justify-center font-bold text-slate-600 text-xs">
                     🚀 Devfolio
                   </div>
-                  <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-center font-bold text-slate-400 text-xs">
+                  <div className="mc-panel bg-white border border-slate-300 p-4 rounded-2xl flex items-center justify-center font-bold text-slate-600 text-xs">
                     💻 GitHub Student
                   </div>
-                  <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-center font-bold text-slate-400 text-xs">
+                  <div className="mc-panel bg-white border border-slate-300 p-4 rounded-2xl flex items-center justify-center font-bold text-slate-600 text-xs">
                     🎨 Figma Design
                   </div>
-                  <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-center font-bold text-slate-400 text-xs">
+                  <div className="mc-panel bg-white border border-slate-300 p-4 rounded-2xl flex items-center justify-center font-bold text-slate-600 text-xs">
                     ☁️ AWS Educate
                   </div>
                 </div>
@@ -1097,12 +1103,12 @@ export default function EventDetail() {
           {/* 3. SCHEDULE TAB */}
           <div id="schedule-section" className="py-20 max-w-7xl mx-auto scroll-mt-24">
             <div className="space-y-6">
-              <h3 className="font-black text-white text-base flex items-center gap-2">
+              <h3 className="font-black text-slate-900 text-base flex items-center gap-2">
                 <span>📅</span> Sessions & Hackathon Timeline
               </h3>
 
               {!event.agenda || event.agenda.length === 0 ? (
-                <div className="text-center py-10 bg-slate-800/10 border border-slate-800 rounded-3xl text-slate-500 text-xs">
+                <div className="text-center py-10 bg-slate-100/10 border border-slate-300 rounded-3xl text-slate-500 text-xs">
                   Timeline schedule is currently empty.
                 </div>
               ) : (
@@ -1111,15 +1117,15 @@ export default function EventDetail() {
                     <div key={idx} className="relative">
                       <div className="absolute -left-[29px] w-4 h-4 rounded-full border-4 border-slate-950 bg-indigo-500 ring-2 ring-indigo-500/30 top-1.5" />
                       
-                      <div className="bg-slate-800/20 border border-slate-800 p-4 rounded-2xl flex justify-between items-center">
+                      <div className="mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-4 rounded-2xl flex justify-between items-center">
                         <div>
                           <span className="text-indigo-400 font-mono text-xs font-black">{item.time}</span>
-                          <h4 className="font-bold text-white text-sm mt-0.5">{item.session}</h4>
+                          <h4 className="font-bold text-slate-900 text-sm mt-0.5">{item.session}</h4>
                           <p className="text-[10px] text-slate-500">Venue: {item.location || 'Main Auditorium'}</p>
                         </div>
                         
                         {item.speaker && (
-                          <span className="text-xs text-slate-300 font-semibold bg-slate-900 border border-slate-800 px-3 py-1 rounded-lg">
+                          <span className="text-xs text-slate-700 font-semibold mc-panel bg-white border border-slate-300 px-3 py-1 rounded-lg">
                             🎤 Speaker: {item.speaker}
                           </span>
                         )}
@@ -1134,14 +1140,14 @@ export default function EventDetail() {
           {/* 4. LEADERBOARD TAB */}
           <div id="leaderboard-section" className="py-20 max-w-7xl mx-auto scroll-mt-24">
             <div className="space-y-6">
-              <h3 className="text-lg font-black text-white flex items-center gap-2">
+              <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
                 <span>🏆</span> Gamified XP Leaderboard
               </h3>
 
-              <div className="bg-slate-800/20 border border-slate-800 p-6 rounded-3xl space-y-4">
-                <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-                  <span className="text-slate-400 text-xs font-bold">Attendee Name</span>
-                  <span className="text-slate-400 text-xs font-bold">XP Score</span>
+              <div className="mc-panel bg-white border-4 border-slate-300 p-6 space-y-4">
+                <div className="flex justify-between items-center border-b border-slate-300 pb-3">
+                  <span className="text-slate-600 text-xs font-bold">Attendee Name</span>
+                  <span className="text-slate-600 text-xs font-bold">XP Score</span>
                 </div>
 
                 <div className="space-y-2">
@@ -1149,17 +1155,53 @@ export default function EventDetail() {
                     <div className="text-xs text-slate-500 italic">No XP records calculated. Go to Dashboard to play the live quiz!</div>
                   ) : (
                     quizLeaderboard.map((lb, idx) => (
-                      <div key={idx} className="flex justify-between items-center bg-slate-950 border border-slate-900 px-4 py-2.5 rounded-xl">
+                      <div key={idx} className="flex justify-between items-center mc-panel bg-white border-4 border-slate-200 border border-slate-300 px-4 py-2.5 rounded-xl">
                         <div className="flex items-center gap-3">
                           <span className="font-mono font-bold text-slate-500">{idx + 1}.</span>
-                          <span className="font-bold text-slate-200 text-xs">{lb.name}</span>
-                          <span className="text-[9px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded uppercase">{lb.department || 'CS'}</span>
+                          <span className="font-bold text-slate-800 text-xs">{lb.name}</span>
+                          <span className="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded uppercase">{lb.department || 'CS'}</span>
                         </div>
-                        <span className="font-black text-amber-400 text-xs">{lb.points} XP</span>
+                        <span className="font-black text-amber-700 text-xs">{lb.points} XP</span>
                       </div>
                     ))
                   )}
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 4.5. EVENT BUDDIES TAB */}
+          <div id="buddies-section" className="py-20 max-w-7xl mx-auto scroll-mt-24">
+            <div className="space-y-6">
+              <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                <span>🤝</span> Find an Event Buddy
+              </h3>
+              <p className="text-slate-600 text-xs">Connect with other students attending this event to collaborate, form teams, or just hang out!</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {attendeesList && attendeesList.length > 0 ? (
+                  attendeesList.filter(a => a.id !== userId).map(attendee => (
+                    <div key={attendee.id} className="mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-4 rounded-3xl flex items-center gap-4 hover:border-indigo-500/50 transition">
+                      <div className="w-12 h-12 rounded-full mc-panel bg-white border-2 border-indigo-500/30 overflow-hidden">
+                        <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${attendee.name}&backgroundColor=0f172a`} alt="Avatar" className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-slate-900 text-sm">{attendee.name}</h4>
+                        <div className="text-[10px] text-slate-600 uppercase tracking-wider">{attendee.department}</div>
+                      </div>
+                      <button 
+                        onClick={() => alert(`Connection request sent to ${attendee.name}!`)}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-slate-900 font-bold text-xs px-3 py-1.5 rounded-xl transition"
+                      >
+                        Connect
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-10 bg-slate-100/10 border border-slate-300 rounded-3xl text-slate-500 text-xs">
+                    You are the first to RSVP! Wait for others to join.
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1169,9 +1211,9 @@ export default function EventDetail() {
             <div className="space-y-8">
               
               {/* ── ALL-IN-ONE QUIZ ARENA INTEGRATION ── */}
-              <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl space-y-4" id="quiz-arena-section">
+              <div className="mc-panel bg-white border border-slate-300 p-6 rounded-3xl space-y-4" id="quiz-arena-section">
                 <div className="flex justify-between items-center">
-                  <h3 className="font-black text-white text-sm flex items-center gap-2">
+                  <h3 className="font-black text-slate-900 text-sm flex items-center gap-2">
                     <span>📝</span> Live Quiz Arena
                   </h3>
                   
@@ -1179,7 +1221,7 @@ export default function EventDetail() {
                     <select
                       value={activeQuizId || ''}
                       onChange={e => selectQuiz(e.target.value)}
-                      className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-300 focus:outline-none"
+                      className="mc-panel bg-white border-4 border-slate-200 border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-700 focus:outline-none"
                     >
                       {quizzes.map((q, idx) => (
                         <option key={q.id} value={q.id}>Quiz {idx + 1}</option>
@@ -1189,7 +1231,7 @@ export default function EventDetail() {
                 </div>
 
                 {quizzes.length === 0 ? (
-                  <div className="text-center py-8 text-slate-500 text-xs italic bg-slate-950/30 rounded-2xl border border-slate-900">
+                  <div className="text-center py-8 text-slate-500 text-xs italic mc-panel bg-white border-4 border-slate-200/30 rounded-2xl border border-slate-300">
                     No active quizzes running for this event currently.
                   </div>
                 ) : (
@@ -1197,13 +1239,13 @@ export default function EventDetail() {
                     const currentQuiz = quizzes.find(q => q.id === activeQuizId) || quizzes[0]
                     const attempted = quizSubmissions.includes(currentQuiz.id)
                     return (
-                      <div className="bg-slate-950 border border-slate-900 p-5 rounded-2xl space-y-4">
-                        <div className="flex justify-between items-center text-[10px] font-bold text-slate-400">
+                      <div className="mc-panel bg-white border-4 border-slate-200 border border-slate-300 p-5 rounded-2xl space-y-4">
+                        <div className="flex justify-between items-center text-[10px] font-bold text-slate-600">
                           <span>QUESTION CHALLENGE</span>
-                          <span className="text-amber-400">+{currentQuiz.points || 50} XP</span>
+                          <span className="text-amber-700">+{currentQuiz.points || 50} XP</span>
                         </div>
 
-                        <h4 className="font-bold text-slate-200 text-sm leading-relaxed">
+                        <h4 className="font-bold text-slate-800 text-sm leading-relaxed">
                           {currentQuiz.question}
                         </h4>
 
@@ -1217,10 +1259,10 @@ export default function EventDetail() {
                                 disabled={attempted}
                                 className={`w-full text-left rounded-xl px-4 py-3 text-xs font-semibold border transition ${
                                   selectedQuizOption === optChar
-                                    ? 'border-indigo-500 bg-indigo-500/10 text-white'
+                                    ? 'border-indigo-500 bg-indigo-500/10 text-slate-900'
                                     : attempted
-                                      ? 'border-slate-900 bg-slate-950 text-slate-600 cursor-not-allowed'
-                                      : 'border-slate-850 bg-slate-900 hover:border-slate-700 text-slate-300'
+                                      ? 'border-slate-300 mc-panel bg-white border-4 border-slate-200 text-slate-600 cursor-not-allowed'
+                                      : 'border-slate-850 mc-panel bg-white hover:border-slate-700 text-slate-700'
                                 }`}
                               >
                                 <span className="text-indigo-400 mr-2">{optChar}.</span> {opt}
@@ -1232,12 +1274,12 @@ export default function EventDetail() {
                         {!attempted ? (
                           <button
                             onClick={() => handleAttemptQuiz(currentQuiz.id)}
-                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2.5 rounded-xl transition"
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-slate-900 font-bold text-xs py-2.5 rounded-xl transition"
                           >
                             Submit Quiz Answer
                           </button>
                         ) : (
-                          <div className="text-center text-xs text-slate-500 font-bold bg-slate-900/50 py-2 rounded-xl">
+                          <div className="text-center text-xs text-slate-500 font-bold mc-panel bg-white/50 py-2 rounded-xl">
                             ✓ Answer submitted! Verify Leaderboard points.
                           </div>
                         )}
@@ -1248,11 +1290,11 @@ export default function EventDetail() {
               </div>
 
               {/* ── FOOD COURT & MEAL MANAGEMENT PANEL ── */}
-              <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl space-y-4 animate-fade-in" id="food-section">
-                <h3 className="font-black text-white text-sm flex items-center gap-2">
+              <div className="mc-panel bg-white border border-slate-300 p-6 rounded-3xl space-y-4 animate-fade-in" id="food-section">
+                <h3 className="font-black text-slate-900 text-sm flex items-center gap-2">
                   <span>🍲</span> Food Court & Meal Management
                 </h3>
-                <p className="text-slate-400 text-xs leading-relaxed max-w-xl">
+                <p className="text-slate-600 text-xs leading-relaxed max-w-xl">
                   Claim food coupons for your meals. Note: Meal claiming requires you to physically check-in at a room zone first!
                 </p>
 
@@ -1260,9 +1302,9 @@ export default function EventDetail() {
                   
                   {/* Left side: Available Meal Menu Cards */}
                   <div className="lg:col-span-2 space-y-3">
-                    <div className="bg-slate-950 border border-slate-900 p-4 rounded-2xl flex justify-between items-center text-xs">
+                    <div className="mc-panel bg-white border-4 border-slate-200 border border-slate-300 p-4 rounded-2xl flex justify-between items-center text-xs">
                       <div>
-                        <div className="font-bold text-slate-200">🍛 Lunch Combo Buffet</div>
+                        <div className="font-bold text-slate-800">🍛 Lunch Combo Buffet</div>
                         <p className="text-[10px] text-slate-500">Menu: Veg Pulao, Paneer Masala, Salad, Sweets</p>
                         <span className="text-[10px] text-indigo-400">Serving 1:30 PM - 3:30 PM</span>
                       </div>
@@ -1274,16 +1316,16 @@ export default function EventDetail() {
                       ) : (
                         <button 
                           onClick={() => handleClaimMeal('Lunch')}
-                          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg transition"
+                          className="bg-indigo-600 hover:bg-indigo-700 text-slate-900 font-bold px-3 py-1.5 rounded-lg transition"
                         >
                           Claim Coupon
                         </button>
                       )}
                     </div>
 
-                    <div className="bg-slate-950 border border-slate-900 p-4 rounded-2xl flex justify-between items-center text-xs">
+                    <div className="mc-panel bg-white border-4 border-slate-200 border border-slate-300 p-4 rounded-2xl flex justify-between items-center text-xs">
                       <div>
-                        <div className="font-bold text-slate-200">🍪 Evening Snacks & Chai</div>
+                        <div className="font-bold text-slate-800">🍪 Evening Snacks & Chai</div>
                         <p className="text-[10px] text-slate-500">Menu: Hot Samosas, Biscuits, Masala Tea</p>
                         <span className="text-[10px] text-indigo-400">Serving 5:30 PM - 6:30 PM</span>
                       </div>
@@ -1295,7 +1337,7 @@ export default function EventDetail() {
                       ) : (
                         <button 
                           onClick={() => handleClaimMeal('Snacks')}
-                          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg transition"
+                          className="bg-indigo-600 hover:bg-indigo-700 text-slate-900 font-bold px-3 py-1.5 rounded-lg transition"
                         >
                           Claim Coupon
                         </button>
@@ -1304,9 +1346,9 @@ export default function EventDetail() {
                   </div>
 
                   {/* Right side: Claimed active Coupon display */}
-                  <div className="bg-slate-850 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between text-center space-y-4">
+                  <div className="mc-panel bg-slate-50 border border-slate-300 p-5 rounded-2xl flex flex-col justify-between text-center space-y-4">
                     <div>
-                      <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Your Meal Ticket</h4>
+                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Your Meal Ticket</h4>
                       <p className="text-[10px] text-slate-500 mt-0.5">Show this to the food court operator to serve meal.</p>
                     </div>
 
@@ -1318,11 +1360,11 @@ export default function EventDetail() {
                         return (
                           <div className="space-y-2">
                             <div className="bg-white p-2.5 rounded-xl inline-block shadow border">
-                              <QRCode value={`eventify:food_coupon:${latest.id}`} size={100} />
+                              <span className="text-xl font-bold px-4 py-2 block text-indigo-700">{latest.meal} Ticket</span>
                             </div>
-                            <div className="text-[10px] text-slate-200 font-bold">{latest.meal} Ticket</div>
+                            <div className="text-[10px] text-slate-800 font-bold">{latest.meal} Ticket</div>
                             <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${
-                              latest.verified ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
+                              latest.verified ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-700'
                             }`}>
                               {latest.verified ? 'VERIFIED / SERVED 🍲' : 'CLAIMED / ACTIVE 🎫'}
                             </span>
@@ -1340,8 +1382,8 @@ export default function EventDetail() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4" id="helpdesk-section">
                 
                 {/* Submit Ticket */}
-                <div className="bg-slate-800/20 border border-slate-800 p-6 rounded-3xl space-y-4">
-                  <h3 className="font-black text-white text-sm flex items-center gap-2">
+                <div className="mc-panel bg-white border-4 border-slate-300 p-6 space-y-4">
+                  <h3 className="font-black text-slate-900 text-sm flex items-center gap-2">
                     <span>🆘</span> Help Desk Support Alert
                   </h3>
                   
@@ -1352,7 +1394,7 @@ export default function EventDetail() {
                         <select
                           value={helpCat}
                           onChange={e => setHelpCat(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-300 focus:outline-none"
+                          className="w-full mc-panel bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-700 focus:outline-none"
                         >
                           <option value="query">General Query</option>
                           <option value="lost-item">Lost & Found Item</option>
@@ -1366,7 +1408,7 @@ export default function EventDetail() {
                         <select
                           value={helpPriority}
                           onChange={e => setHelpPriority(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-300 focus:outline-none"
+                          className="w-full mc-panel bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-700 focus:outline-none"
                         >
                           <option value="low">Low Priority</option>
                           <option value="medium">Medium Priority</option>
@@ -1381,38 +1423,38 @@ export default function EventDetail() {
                         value={helpMsg}
                         onChange={e => setHelpMsg(e.target.value)}
                         placeholder="Detail your request or query here..."
-                        className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-slate-200 focus:outline-none h-16 resize-none"
+                        className="w-full mc-panel bg-white border border-slate-300 rounded-xl p-3 text-slate-800 focus:outline-none h-16 resize-none"
                         required
                       />
                     </div>
 
-                    <button type="submit" disabled={submittingHelp} className="w-full bg-indigo-600 hover:bg-indigo-750 text-white font-bold py-2 rounded-xl transition">
+                    <button type="submit" disabled={submittingHelp} className="w-full bg-indigo-600 hover:bg-indigo-750 text-slate-900 font-bold py-2 rounded-xl transition">
                       {submittingHelp ? 'Submitting...' : 'Submit Support Ticket'}
                     </button>
                   </form>
                 </div>
 
                 {/* Queue status */}
-                <div className="bg-slate-800/20 border border-slate-800 p-6 rounded-3xl space-y-4">
-                  <h3 className="font-black text-white text-sm">🆘 Active Help Desk Queue</h3>
+                <div className="mc-panel bg-white border-4 border-slate-300 p-6 space-y-4">
+                  <h3 className="font-black text-slate-900 text-sm">🆘 Active Help Desk Queue</h3>
                   <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
                     {helpTickets.length === 0 ? (
                       <div className="text-center py-10 text-slate-600 text-xs italic">No support tickets in queue currently!</div>
                     ) : (
                       helpTickets.map((t, idx) => (
-                        <div key={idx} className="bg-slate-950 border border-slate-900 p-3 rounded-xl flex justify-between items-center text-xs">
+                        <div key={idx} className="mc-panel bg-white border-4 border-slate-200 border border-slate-300 p-3 rounded-xl flex justify-between items-center text-xs">
                           <div>
                             <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full mr-2 ${
                               t.resolved ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
                             }`}>
                               {t.resolved ? 'Resolved' : 'Pending'}
                             </span>
-                            <span className="font-bold text-slate-300">Ticket #{t.id} ({t.category})</span>
-                            <p className="text-slate-400 mt-1">{t.message}</p>
+                            <span className="font-bold text-slate-700">Ticket #{t.id} ({t.category})</span>
+                            <p className="text-slate-600 mt-1">{t.message}</p>
                           </div>
                           
                           {(userRole === 'organizer' || userRole === 'admin') && !t.resolved && (
-                            <button onClick={() => handleResolveTicket(t.id)} className="bg-indigo-600 hover:bg-indigo-700 text-[10px] font-bold text-white px-2 py-0.5 rounded">
+                            <button onClick={() => handleResolveTicket(t.id)} className="bg-indigo-600 hover:bg-indigo-700 text-[10px] font-bold text-slate-900 px-2 py-0.5 rounded">
                               Resolve
                             </button>
                           )}
@@ -1432,19 +1474,19 @@ export default function EventDetail() {
             <div className="space-y-6">
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-slate-800/20 border border-slate-800 p-4 rounded-2xl text-center">
+                <div className="mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-4 rounded-2xl text-center">
                   <div className="text-slate-500 text-xs font-bold uppercase mb-1">Registrations</div>
                   <div className="text-3xl font-black text-indigo-400">{count}</div>
                 </div>
-                <div className="bg-slate-800/20 border border-slate-800 p-4 rounded-2xl text-center">
+                <div className="mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-4 rounded-2xl text-center">
                   <div className="text-slate-500 text-xs font-bold uppercase mb-1">XP Leaderboard size</div>
-                  <div className="text-3xl font-black text-amber-400">{quizLeaderboard.length}</div>
+                  <div className="text-3xl font-black text-amber-700">{quizLeaderboard.length}</div>
                 </div>
-                <div className="bg-slate-800/20 border border-slate-800 p-4 rounded-2xl text-center">
+                <div className="mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-4 rounded-2xl text-center">
                   <div className="text-slate-500 text-xs font-bold uppercase mb-1">No-Show rate</div>
                   <div className="text-3xl font-black text-rose-400">8%</div>
                 </div>
-                <div className="bg-slate-800/20 border border-slate-800 p-4 rounded-2xl text-center">
+                <div className="mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-4 rounded-2xl text-center">
                   <div className="text-slate-500 text-xs font-bold uppercase mb-1">Health Score</div>
                   <div className="text-3xl font-black text-emerald-400">96 XP</div>
                 </div>
@@ -1452,44 +1494,44 @@ export default function EventDetail() {
 
               {/* Budget spread */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-slate-800/20 border border-slate-800 p-5 rounded-2xl space-y-3">
-                  <h3 className="font-bold text-white text-sm">📊 Attendee Department Spread</h3>
+                <div className="lg:col-span-2 mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-5 rounded-2xl space-y-3">
+                  <h3 className="font-bold text-slate-900 text-sm">📊 Attendee Department Spread</h3>
                   <div className="space-y-3 pt-2">
                     <div className="space-y-1">
-                      <div className="flex justify-between text-xs text-slate-300">
+                      <div className="flex justify-between text-xs text-slate-700">
                         <span>Computer Science (CS)</span>
                         <span className="font-bold">48%</span>
                       </div>
-                      <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+                      <div className="w-full mc-panel bg-white border-4 border-slate-200 h-2 rounded-full overflow-hidden">
                         <div className="bg-indigo-500 h-full rounded-full" style={{ width: '48%' }} />
                       </div>
                     </div>
 
                     <div className="space-y-1">
-                      <div className="flex justify-between text-xs text-slate-300">
+                      <div className="flex justify-between text-xs text-slate-700">
                         <span>Electronics Engineering (ECE)</span>
                         <span className="font-bold">24%</span>
                       </div>
-                      <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+                      <div className="w-full mc-panel bg-white border-4 border-slate-200 h-2 rounded-full overflow-hidden">
                         <div className="bg-purple-500 h-full rounded-full" style={{ width: '24%' }} />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-slate-800/20 border border-slate-800 p-5 rounded-2xl space-y-2">
-                  <h3 className="font-bold text-white text-sm">💰 Budget Ledger Summary</h3>
+                <div className="mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-5 rounded-2xl space-y-2">
+                  <h3 className="font-bold text-slate-900 text-sm">💰 Budget Ledger Summary</h3>
                   <div className="space-y-2 pt-1 text-xs">
-                    <div className="flex justify-between border-b border-slate-800/40 pb-1.5">
-                      <span className="text-slate-400">Total Sponsorships</span>
+                    <div className="flex justify-between border-b border-slate-300/40 pb-1.5">
+                      <span className="text-slate-600">Total Sponsorships</span>
                       <span className="font-bold text-emerald-400">₹85,000</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-800/40 pb-1.5">
-                      <span className="text-slate-400">Catering Expenses</span>
+                    <div className="flex justify-between border-b border-slate-300/40 pb-1.5">
+                      <span className="text-slate-600">Catering Expenses</span>
                       <span className="font-bold text-rose-400">-₹35,000</span>
                     </div>
                     <div className="flex justify-between pt-1">
-                      <span className="text-slate-200 font-bold">Net Profit</span>
+                      <span className="text-slate-800 font-bold">Net Profit</span>
                       <span className="font-black text-emerald-400 text-sm">₹30,000</span>
                     </div>
                   </div>
@@ -1507,22 +1549,22 @@ export default function EventDetail() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* Announcement broadcaster */}
-                <div className="bg-slate-800/20 border border-slate-800 p-5 rounded-2xl space-y-3">
-                  <h3 className="font-bold text-white text-xs">📢 Push Live Ticker Announcement</h3>
+                <div className="mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-5 rounded-2xl space-y-3">
+                  <h3 className="font-bold text-slate-900 text-xs">📢 Push Live Ticker Announcement</h3>
                   <textarea
                     value={newAnnouncement}
                     onChange={e => setNewAnnouncement(e.target.value)}
                     placeholder="Type live notification message..."
-                    className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none h-16 resize-none"
+                    className="w-full mc-panel bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 focus:outline-none h-16 resize-none"
                   />
-                  <button onClick={handlePushAnnouncement} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-1.5 rounded-lg transition">
+                  <button onClick={handlePushAnnouncement} className="w-full bg-indigo-600 hover:bg-indigo-700 text-slate-900 font-bold text-xs py-1.5 rounded-lg transition">
                     Broadcast Live Announcement
                   </button>
                 </div>
 
                 {/* Live Food Coupon verification scanner */}
-                <div className="bg-slate-800/20 border border-slate-800 p-5 rounded-2xl space-y-3">
-                  <h3 className="font-bold text-white text-xs">🍲 Verify Food Meal Ticket</h3>
+                <div className="mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-5 rounded-2xl space-y-3">
+                  <h3 className="font-bold text-slate-900 text-xs">🍲 Verify Food Meal Ticket</h3>
                   <p className="text-[10px] text-slate-500">Scan or type student meal coupon code manually to verify servings.</p>
                   
                   <form onSubmit={handleVerifyMealCoupon} className="space-y-2">
@@ -1531,25 +1573,25 @@ export default function EventDetail() {
                       value={verifyCouponCode}
                       onChange={e => setVerifyCouponCode(e.target.value)}
                       placeholder="e.g. MEAL-1-XXXX-LUNCH"
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none"
+                      className="w-full mc-panel bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none"
                       required
                     />
-                    <button type="submit" disabled={verifyingMeal} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-1.5 rounded-lg transition">
+                    <button type="submit" disabled={verifyingMeal} className="w-full bg-emerald-600 hover:bg-emerald-700 text-slate-900 font-bold text-xs py-1.5 rounded-lg transition">
                       {verifyingMeal ? 'Verifying Coupon...' : 'Verify Coupon Code'}
                     </button>
                   </form>
                 </div>
 
                 {/* Complete & Certificate trigger */}
-                <div className="bg-slate-800/20 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between space-y-3">
+                <div className="mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-5 rounded-2xl flex flex-col justify-between space-y-3">
                   <div>
-                    <h3 className="font-bold text-white text-xs">🏆 Complete Event Phase</h3>
+                    <h3 className="font-bold text-slate-900 text-xs">🏆 Complete Event Phase</h3>
                     <p className="text-[10px] text-slate-500 mt-1">Unlock certificate participation downloads and rating reviews for attendees.</p>
                   </div>
                   
                   <div className="space-y-2">
                     {event.phase !== 'after' ? (
-                      <button onClick={handleToggleCompletion} className="w-full bg-emerald-600 hover:bg-emerald-750 text-white font-bold text-xs py-2 rounded-lg transition">
+                      <button onClick={handleToggleCompletion} className="w-full bg-emerald-600 hover:bg-emerald-750 text-slate-900 font-bold text-xs py-2 rounded-lg transition">
                         Complete Event & Unlock Certs
                       </button>
                     ) : (
@@ -1557,7 +1599,7 @@ export default function EventDetail() {
                         ✓ Certificates & Feedback Unlocked
                       </div>
                     )}
-                    <button onClick={handleExportCSV} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-xs py-2 rounded-lg transition">
+                    <button onClick={handleExportCSV} className="w-full bg-slate-100 hover:bg-slate-700 border border-slate-700 text-slate-800 font-bold text-xs py-2 rounded-lg transition">
                       Export Attendees CSV Report
                     </button>
                   </div>
@@ -1569,8 +1611,8 @@ export default function EventDetail() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
                 
                 {/* Create Quiz */}
-                <div className="bg-slate-800/20 border border-slate-800 p-5 rounded-2xl space-y-3">
-                  <h3 className="font-bold text-white text-xs">📝 Add Quiz Challenge</h3>
+                <div className="mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-5 rounded-2xl space-y-3">
+                  <h3 className="font-bold text-slate-900 text-xs">📝 Add Quiz Challenge</h3>
                   
                   <form onSubmit={handleCreateQuiz} className="space-y-2 text-xs">
                     <input
@@ -1578,7 +1620,7 @@ export default function EventDetail() {
                       value={newQuizQuestion}
                       onChange={e => setNewQuizQuestion(e.target.value)}
                       placeholder="Question..."
-                      className="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-slate-200 focus:outline-none"
+                      className="w-full mc-panel bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 focus:outline-none"
                       required
                     />
                     <div className="grid grid-cols-2 gap-1.5">
@@ -1587,7 +1629,7 @@ export default function EventDetail() {
                         value={newQuizOptA}
                         onChange={e => setNewQuizOptA(e.target.value)}
                         placeholder="Option A..."
-                        className="bg-slate-900 border border-slate-800 rounded px-2 py-1 text-slate-200 focus:outline-none"
+                        className="mc-panel bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 focus:outline-none"
                         required
                       />
                       <input
@@ -1595,7 +1637,7 @@ export default function EventDetail() {
                         value={newQuizOptB}
                         onChange={e => setNewQuizOptB(e.target.value)}
                         placeholder="Option B..."
-                        className="bg-slate-900 border border-slate-800 rounded px-2 py-1 text-slate-200 focus:outline-none"
+                        className="mc-panel bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 focus:outline-none"
                         required
                       />
                     </div>
@@ -1603,12 +1645,12 @@ export default function EventDetail() {
                       <select 
                         value={newQuizCorrect}
                         onChange={e => setNewQuizCorrect(e.target.value)}
-                        className="bg-slate-900 border border-slate-800 rounded px-2 py-1 text-slate-300 focus:outline-none flex-1"
+                        className="mc-panel bg-white border border-slate-300 rounded px-2 py-1 text-slate-700 focus:outline-none flex-1"
                       >
                         <option value="A">Correct: A</option>
                         <option value="B">Correct: B</option>
                       </select>
-                      <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1 rounded text-[10px]">
+                      <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-slate-900 font-bold px-3 py-1 rounded text-[10px]">
                         Add Quiz
                       </button>
                     </div>
@@ -1616,8 +1658,8 @@ export default function EventDetail() {
                 </div>
 
                 {/* Edit event form */}
-                <div className="lg:col-span-2 bg-slate-800/20 border border-slate-800 p-5 rounded-2xl space-y-3">
-                  <h3 className="font-bold text-white text-xs">🛠️ Edit Event Parameters</h3>
+                <div className="lg:col-span-2 mc-panel bg-white border-4 border-slate-300 border border-slate-300 p-5 rounded-2xl space-y-3">
+                  <h3 className="font-bold text-slate-900 text-xs">🛠️ Edit Event Parameters</h3>
                   
                   <form onSubmit={handleUpdateEventDetails} className="space-y-3 text-xs">
                     <div>
@@ -1625,7 +1667,7 @@ export default function EventDetail() {
                       <textarea
                         value={editDesc}
                         onChange={e => setEditDesc(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none h-14 resize-none"
+                        className="w-full mc-panel bg-white border border-slate-300 rounded-xl p-2 text-slate-800 focus:outline-none h-14 resize-none"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
@@ -1634,7 +1676,7 @@ export default function EventDetail() {
                         <textarea
                           value={editRules}
                           onChange={e => setEditRules(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none h-14 resize-none"
+                          className="w-full mc-panel bg-white border border-slate-300 rounded-xl p-2 text-slate-800 focus:outline-none h-14 resize-none"
                         />
                       </div>
                       <div>
@@ -1643,11 +1685,11 @@ export default function EventDetail() {
                           type="text"
                           value={editPrizes}
                           onChange={e => setEditPrizes(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-slate-200 focus:outline-none"
+                          className="w-full mc-panel bg-white border border-slate-300 rounded-xl p-2 text-slate-800 focus:outline-none"
                         />
                       </div>
                     </div>
-                    <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-750 text-white font-bold text-xs py-2 rounded-xl transition">
+                    <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-750 text-slate-900 font-bold text-xs py-2 rounded-xl transition">
                       Save Specifications
                     </button>
                   </form>
@@ -1665,39 +1707,39 @@ export default function EventDetail() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8 animate-fade-in">
             
             {/* Certificate builder */}
-            <div className="lg:col-span-2 bg-slate-900/60 border border-slate-800 p-6 rounded-3xl backdrop-blur-md flex flex-col justify-between space-y-4">
+            <div className="lg:col-span-2 mc-panel bg-white border border-slate-300 p-6 rounded-3xl backdrop-blur-md flex flex-col justify-between space-y-4">
               <div>
                 <span className="bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-[10px] font-bold px-3 py-1 rounded-full uppercase inline-block mb-3">
                   ACCERTIFICATE UNLOCKED 🎓
                 </span>
-                <h3 className="text-lg font-black text-white leading-tight mb-2">DYNAMIC CERTIFICATE OF PARTICIPATION</h3>
-                <p className="text-slate-400 text-xs leading-relaxed">
+                <h3 className="text-lg font-black text-slate-900 leading-tight mb-2">DYNAMIC CERTIFICATE OF PARTICIPATION</h3>
+                <p className="text-slate-600 text-xs leading-relaxed">
                   RCCIT validates your active participation in <strong>{event.title}</strong>! Accredit your profile and download your premium certificate immediately.
                 </p>
               </div>
 
               {/* Certificate preview */}
-              <div className="border-4 border-amber-500/20 bg-slate-950 p-6 rounded-2xl text-center space-y-3 relative overflow-hidden shadow-inner my-2">
+              <div className="border-4 border-amber-500/20 mc-panel bg-white border-4 border-slate-200 p-6 rounded-2xl text-center space-y-3 relative overflow-hidden shadow-inner my-2">
                 <div className="text-4xl">🏅</div>
-                <div className="font-serif text-sm tracking-wider text-slate-300">CERTIFICATE OF PARTICIPATION</div>
+                <div className="font-serif text-sm tracking-wider text-slate-700">CERTIFICATE OF PARTICIPATION</div>
                 <div className="text-[10px] text-slate-500 italic">This is proudly accredited to</div>
-                <div className="font-serif text-base font-bold text-amber-400 uppercase tracking-widest">{userName}</div>
+                <div className="font-serif text-base font-bold text-amber-700 uppercase tracking-widest">{userName}</div>
                 <p className="text-[9px] text-slate-450 leading-relaxed">For successful completion of "{event.title}" campus activities.</p>
               </div>
 
               <button
                 onClick={handleDownloadCertificate}
-                className="w-full bg-indigo-600 hover:bg-indigo-755 text-white font-bold text-sm py-3 rounded-2xl transition shadow flex items-center justify-center gap-2"
+                className="w-full bg-indigo-600 hover:bg-indigo-755 text-slate-900 font-bold text-sm py-3 rounded-2xl transition shadow flex items-center justify-center gap-2"
               >
                 <span>🎓</span> Download Verified Certificate
               </button>
             </div>
 
             {/* Ratings & Feedback */}
-            <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl backdrop-blur-md space-y-4 flex flex-col justify-between">
+            <div className="mc-panel bg-white border border-slate-300 p-6 rounded-3xl backdrop-blur-md space-y-4 flex flex-col justify-between">
               <div>
-                <h3 className="font-bold text-white text-base">💬 Review & Ratings</h3>
-                <p className="text-slate-400 text-xs mt-1">Share feedback comments to optimize future RCCIT events!</p>
+                <h3 className="font-bold text-slate-900 text-base">💬 Review & Ratings</h3>
+                <p className="text-slate-600 text-xs mt-1">Share feedback comments to optimize future RCCIT events!</p>
               </div>
 
               {feedbackSubmitted ? (
@@ -1711,7 +1753,7 @@ export default function EventDetail() {
                       <button
                         key={star}
                         onClick={() => setMyRating(star)}
-                        className={`text-3xl transition ${star <= myRating ? 'text-amber-400 scale-110' : 'text-slate-700 hover:text-slate-500'}`}
+                        className={`text-3xl transition ${star <= myRating ? 'text-amber-700 scale-110' : 'text-slate-700 hover:text-slate-500'}`}
                       >
                         ★
                       </button>
@@ -1722,14 +1764,14 @@ export default function EventDetail() {
                     value={myComment}
                     onChange={e => setMyComment(e.target.value)}
                     placeholder="Describe your review comment here..."
-                    className="w-full bg-slate-950 border border-slate-900 rounded-xl p-3 text-xs text-slate-200 focus:outline-none h-20 resize-none"
+                    className="w-full mc-panel bg-white border-4 border-slate-200 border border-slate-300 rounded-xl p-3 text-xs text-slate-800 focus:outline-none h-20 resize-none"
                     required
                   />
 
                   <button
                     onClick={handleSubmitFeedback}
                     disabled={submittingFeedback}
-                    className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-xs py-2.5 rounded-xl transition"
+                    className="w-full bg-slate-100 hover:bg-slate-700 border border-slate-700 text-slate-800 font-bold text-xs py-2.5 rounded-xl transition"
                   >
                     Submit Review Comment
                   </button>
@@ -1748,16 +1790,16 @@ export default function EventDetail() {
 
       {/* ── ASSISTANT FLOATING DRAWER PANEL ──────────────────────────────────── */}
       {showAIAssistant && (
-        <div className="fixed top-0 bottom-0 right-0 z-50 w-full sm:w-96 bg-slate-900/95 border-l border-slate-850 shadow-2xl backdrop-blur-md flex flex-col justify-between">
-          <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/40">
+        <div className="fixed top-0 bottom-0 right-0 z-50 w-full sm:w-96 mc-panel bg-white/95 border-l border-slate-850 shadow-2xl backdrop-blur-md flex flex-col justify-between">
+          <div className="p-4 border-b border-slate-300 flex justify-between items-center mc-panel bg-white border-4 border-slate-200/40">
             <div className="flex items-center gap-2">
               <span className="text-2xl">🤖</span>
               <div>
-                <h3 className="font-bold text-white text-sm">AI Assistant</h3>
+                <h3 className="font-bold text-slate-900 text-sm">AI Assistant</h3>
                 <span className="text-[10px] text-indigo-400 font-bold">Contextual Event Data Bot</span>
               </div>
             </div>
-            <button onClick={() => setShowAIAssistant(false)} className="text-slate-400 hover:text-white text-xl font-bold font-mono px-2">&times;</button>
+            <button onClick={() => setShowAIAssistant(false)} className="text-slate-600 hover:text-slate-900 text-xl font-bold font-mono px-2">&times;</button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -1766,8 +1808,8 @@ export default function EventDetail() {
                 {chat.role !== 'user' && <span className="text-xl">🤖</span>}
                 <div className={`rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed max-w-[85%] ${
                   chat.role === 'user' 
-                    ? 'bg-indigo-600 text-white rounded-tr-none' 
-                    : 'bg-slate-850 border border-slate-800 text-slate-250 rounded-tl-none whitespace-pre-line'
+                    ? 'bg-indigo-600 text-slate-900 rounded-tr-none' 
+                    : 'mc-panel bg-slate-50 border border-slate-300 text-slate-250 rounded-tl-none whitespace-pre-line'
                 }`}>
                   {chat.content}
                 </div>
@@ -1776,49 +1818,21 @@ export default function EventDetail() {
             <div ref={chatBottomRef} />
           </div>
 
-          <div className="p-3 border-t border-slate-800 bg-slate-950/20 flex gap-2">
+          <div className="p-3 border-t border-slate-300 mc-panel bg-white border-4 border-slate-200/20 flex gap-2">
             <input
               type="text"
               value={aiMessage}
               onChange={e => setAiMessage(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleSendAIMessage() }}
               placeholder="Where is venue? food? prizes? rules?..."
-              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-105 focus:outline-none focus:border-indigo-600 transition"
+              className="flex-1 mc-panel bg-white border-4 border-slate-200 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-105 focus:outline-none focus:border-indigo-600 transition"
             />
-            <button onClick={handleSendAIMessage} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition">Ask</button>
+            <button onClick={handleSendAIMessage} className="bg-indigo-600 hover:bg-indigo-700 text-slate-900 font-bold text-xs px-4 py-2 rounded-xl transition">Ask</button>
           </div>
         </div>
       )}
 
-      {/* ── ENTRY TICKET QR CODE MODAL ────────────────────────────────────────── */}
-      {showQR && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
-          onClick={() => setShowQR(false)}>
-          <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl max-w-sm w-full text-center relative overflow-hidden"
-            onClick={e => e.stopPropagation()}>
-            
-            <div className="absolute top-[-20%] left-[-20%] w-48 h-48 bg-emerald-500/10 rounded-full blur-[60px] pointer-events-none" />
-            
-            <h3 className="text-lg font-black text-white mb-1">EVENT ENTRY TICKET</h3>
-            <p className="text-slate-400 text-xs mb-5">Scan this QR desk at entry gate registration counters.</p>
-            
-            <div className="bg-white p-4 inline-block rounded-2xl shadow-inner border border-slate-250 mb-4">
-              <QRCode value={`eventify:user_${userId}:event_${event.id}`} size={160} />
-            </div>
-            
-            <div className="font-mono text-[10px] text-slate-400 mb-5 uppercase tracking-wide">
-              Event #{event.id} · Student: {userName.toUpperCase()}
-            </div>
-            
-            <button 
-              onClick={() => setShowQR(false)}
-              className="w-full bg-slate-850 hover:bg-slate-800 border border-slate-700 text-slate-200 py-3 rounded-2xl font-bold text-xs transition"
-            >
-              Close Entry Ticket
-            </button>
-          </div>
-        </div>
-      )}
+
 
       {/* Dynamic Confetti celebration */}
       {showConfetti && (

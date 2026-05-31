@@ -8,7 +8,6 @@ export default function Navbar() {
 
   const links = [
     { path: '/feed',         label: '🏠 Feed'     },
-    { path: '/dashboard',    label: '📊 Dashboard' },
     { path: '/explore',      label: '🌐 Explore'  },
     { path: '/leaderboard',  label: '🏆 Board'    },
     { path: '/certificates', label: '🏅 Certs'    },
@@ -26,35 +25,43 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-40">
-      <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <span onClick={() => navigate('/feed')}
-          className="font-bold text-indigo-600 text-lg cursor-pointer select-none">
-          ⚡ Eventify
-        </span>
-        <div className="flex items-center gap-1 sm:gap-3">
+    <div className="sticky top-4 z-40 px-4 sm:px-6 w-full max-w-7xl mx-auto">
+      <nav className="mc-panel rounded-none px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <img src="/theme-assets/lantern.png" alt="Lantern" className="w-8 h-8 object-contain animate-pulse" style={{ animationDuration: '3s' }} />
+          <span onClick={() => navigate('/feed')}
+            className="font-vt font-black text-slate-800 text-3xl cursor-pointer select-none hidden sm:block tracking-widest hover:-translate-y-1 transition-transform duration-300 text-shadow-sm">
+            EVENTIFY
+          </span>
+          <span onClick={() => navigate('/feed')}
+            className="font-vt font-black text-slate-800 text-3xl cursor-pointer select-none sm:hidden text-shadow-sm">
+            E
+          </span>
+        </div>
+        <div className="flex items-center gap-1 sm:gap-2 flex-wrap justify-end font-outfit">
           {links.map(l => (
             <button key={l.path} onClick={() => navigate(l.path)}
-              className={`text-xs sm:text-sm font-medium px-2 py-1 rounded-lg transition
+              className={`text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-none transition-all duration-300 uppercase tracking-wider
                 ${loc.pathname === l.path
-                  ? 'bg-indigo-50 text-indigo-600'
-                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'}`}>
+                  ? 'mc-btn'
+                  : 'text-slate-600 hover:text-slate-900 border-2 border-transparent hover:border-slate-300 hover:bg-slate-100'}`}>
               {l.label}
             </button>
           ))}
-          <div className="flex items-center gap-2 ml-2">
-            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center
-              justify-center text-sm font-semibold text-indigo-700 cursor-pointer"
+
+          <div className="flex items-center gap-3 ml-2 sm:ml-4 border-l-4 border-slate-300 pl-3 sm:pl-5">
+            <div className="w-8 h-8 rounded-none bg-green-500 border-2 border-green-700 border-b-4 border-r-4 border-b-green-800 border-r-green-800 flex items-center
+              justify-center text-xs font-bold text-white cursor-pointer hover:-translate-y-1 transition-all shadow-sm"
               onClick={() => navigate('/portfolio')}>
               {name[0]?.toUpperCase()}
             </div>
             <button onClick={logout}
-              className="text-xs text-gray-400 hover:text-red-400 transition">
-              out
+              className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-red-500 transition-colors">
+              Out
             </button>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </div>
   )
 }

@@ -1,3 +1,56 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-green-50 text-slate-800 antialiased selection:bg-green-500/30;
+    font-family: 'Outfit', sans-serif;
+    /* Bright Minecraft / Grassland background */
+    background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 40%, #c4ebd1 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-wide text-slate-900;
+    font-family: 'VT323', monospace;
+  }
+}
+
+@layer utilities {
+  .mc-panel {
+    @apply bg-white/90 backdrop-blur-md border-4 border-slate-300 shadow-[4px_4px_0_rgba(0,0,0,0.1)];
+  }
+  
+  .mc-card {
+    @apply bg-white border-2 border-slate-200 border-b-4 border-r-4 border-b-slate-400 border-r-slate-400 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-200;
+  }
+
+  .mc-btn {
+    @apply bg-green-500 text-white font-bold border-2 border-green-700 border-b-4 border-r-4 border-b-green-800 border-r-green-800 active:border-b-2 active:border-r-2 active:translate-y-[2px] transition-all;
+  }
+  
+  .mc-btn-secondary {
+    @apply bg-slate-200 text-slate-700 font-bold border-2 border-slate-400 border-b-4 border-r-4 border-b-slate-500 border-r-slate-500 active:border-b-2 active:border-r-2 active:translate-y-[2px] transition-all;
+  }
+
+  .text-shadow-sm {
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+  }
+  
+  .text-shadow-mc {
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #e2e8f0;
+    border-left: 2px solid #cbd5e1;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-400 border-2 border-slate-500 hover:bg-slate-500 transition-colors;
+  }
+}

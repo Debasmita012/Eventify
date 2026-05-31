@@ -55,7 +55,7 @@ export default function Portfolio() {
   const badgesCount = Math.min(certificates.length + (certificates.length > 0 ? 2 : 0), 10) // Approx mapping from Achievements component logic
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 bg-white min-h-screen">
+    <div className="max-w-6xl mx-auto px-4 py-8 bg-transparent min-h-screen relative z-10 font-outfit text-slate-100">
       <ProfileHeader 
         user={data.user} 
         totalEvents={allEvents.length} 

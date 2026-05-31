@@ -17,7 +17,6 @@
     "react-confetti": "^6.4.0",
     "react-dom": "^19.2.6",
     "react-leaflet": "^5.0.0",
-    "react-qr-code": "^2.0.21",
     "react-router-dom": "^7.15.1",
     "react-use": "^17.6.0",
     "recharts": "^3.8.1",

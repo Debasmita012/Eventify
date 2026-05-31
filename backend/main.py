@@ -558,23 +558,29 @@ async def chat_stream(req: ChatReq):
 
 @app.get("/external-events")
 def external_events(
-    source:   Optional[str] = None,
-    category: Optional[str] = None,
-    refresh:  bool = False
+    source:  Optional[str] = None,
+    refresh: bool          = False,
 ):
     events = get_external_events(force_refresh=refresh)
-    if source:
+    if source and source != "all":
         events = [e for e in events if e.get("source") == source]
-    if category:
-        events = [e for e in events if e.get("category") == category]
     return events
 
+@app.get("/external-events/refresh")
+def refresh_external():
+    events = get_external_events(force_refresh=True)
+    live   = sum(1 for e in events if e.get("is_live_data"))
+    static = sum(1 for e in events if not e.get("is_live_data"))
+    return {
+        "total":   len(events),
+        "live":    live,
+        "static":  static,
+        "message": "Refreshed ✅"
+    }
+
 @app.get("/all-events")
-def all_events_unified(
-    category: Optional[str] = None,
-    source:   Optional[str] = None,
-):
-    """Unified feed — campus + external events merged."""
+def all_events_unified(category: Optional[str] = None):
+    """Campus events + external events in one unified feed."""
     db = get_db()
 
     # Campus events
@@ -582,25 +588,20 @@ def all_events_unified(
     campus = list(db.events.find(query, {"_id": 0})
                             .sort("rsvp_count", -1))
     for e in campus:
-        e["source"]   = "campus"
-        e["external"] = False
+        e["source"]       = "campus"
+        e["source_label"] = "Campus"
+        e["external"]     = False
 
     # External events
     external = get_external_events()
     if category:
         external = [e for e in external if e.get("category") == category]
-    if source and source != "campus":
-        return external
 
-    # Interleave: campus first, then external
-    merged = campus + external
-    return merged
-
-@app.get("/external-events/refresh")
-def refresh_external():
-    """Force refresh external events cache."""
-    events = get_external_events(force_refresh=True)
-    return {"count": len(events), "message": "Cache refreshed ✅"}
+    return {
+        "campus":   campus,
+        "external": external,
+        "total":    len(campus) + len(external),
+    }
 
 # ── Certificates ──────────────────────────────────────────────────────────
 

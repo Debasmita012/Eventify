@@ -142,6 +142,10 @@ QA_PAIRS = [
    "Eventify is a smart campus event platform by Team REALX (RCCIT). AI-powered, gesture-controlled, personalised! 🎓"),
   (["team","who built","developers","realx"],
    "Eventify is built by Team REALX from RCCIT — Debasmita, Adrija, and Rishi. Made with ❤️ for students!"),
+  (["prepare","how do i prepare","how to prepare","what to bring"],
+   "To prepare for an event, check its Details tab for required skills or prerequisites. For hackathons or tech events, bring your laptop and charger! For cultural or sports events, bring appropriate attire or IDs if mentioned."),
+  (["details","any details","more details","event info"],
+   "You can find all event details like schedule, venue, prizes, and rules by clicking on the event card in your feed to open its dedicated page! If you want to know about a specific event right now, just ask me its name."),
 ]
 
 COMPILED = [(set(kws), resp) for kws, resp in QA_PAIRS]

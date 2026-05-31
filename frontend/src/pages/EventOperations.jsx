@@ -375,7 +375,7 @@ export default function EventOperations() {
             {/* Simulation scanner form */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
               <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-400 mb-4 flex items-center gap-2">
-                <span>🎫</span> QR Ticket Verification Console
+                <span>🎫</span> Ticket Verification Console
               </h3>
               
               <form onSubmit={handleCheckInSimulate} className="space-y-4">
@@ -403,7 +403,7 @@ export default function EventOperations() {
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                   <p className="text-[10px] text-slate-500 mt-1">
-                    * Type a valid user id (e.g. stud-001, stud-002) to simulate scanning a ticket QR.
+                    * Type a valid user id (e.g. stud-001, stud-002) to simulate scanning a ticket.
                   </p>
                 </div>
 

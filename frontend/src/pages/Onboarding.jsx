@@ -75,171 +75,174 @@ export default function Onboarding() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50
-      flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-transparent">
+      
+      {/* MAGICAL CASTLE BACKGROUND */}
+      <img src="/theme-assets/castle.png" alt="Castle" className="absolute inset-0 w-full h-full object-cover object-bottom opacity-30 z-0 pointer-events-none drop-shadow-2xl mix-blend-multiply" />
+
+      <div className="mc-panel p-10 w-full max-w-md relative z-10 animate-float" style={{ animationDuration: '8s' }}>
 
         {isLogin ? (
           <>
             <div className="text-center mb-8">
-              <div className="text-5xl mb-3">👋</div>
-              <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-              <p className="text-gray-500 mt-1 text-sm">Login to your account</p>
+              <h1 className="text-4xl text-slate-800 font-vt mb-2 text-shadow-sm">Welcome Back</h1>
+              <p className="text-slate-600 text-sm font-outfit font-bold">Authenticate to enter the nexus.</p>
             </div>
-            <div className="space-y-3 mb-6">
+            <div className="space-y-4 mb-6 font-outfit">
               <input
-                className="w-full border border-gray-200 rounded-xl px-4 py-3
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+                className="w-full bg-white border-4 border-slate-300 rounded-none px-4 py-3 text-slate-800 focus:outline-none focus:border-green-500 transition-all text-sm placeholder-slate-400 font-bold"
                 placeholder="Email address"
                 type="email"
                 value={form.email}
                 onChange={e => { setError(''); setForm({ ...form, email: e.target.value }) }}
               />
               <input
-                className="w-full border border-gray-200 rounded-xl px-4 py-3
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+                className="w-full bg-white border-4 border-slate-300 rounded-none px-4 py-3 text-slate-800 focus:outline-none focus:border-green-500 transition-all text-sm placeholder-slate-400 font-bold"
                 placeholder="Password"
                 type="password"
                 value={form.password}
                 onChange={e => { setError(''); setForm({ ...form, password: e.target.value }) }}
               />
             </div>
-            {error && <p className="text-red-500 text-sm mb-3 text-center">{error}</p>}
+            {error && <p className="text-red-700 font-bold text-sm mb-4 text-center font-outfit bg-red-100 py-2 border-2 border-red-300">{error}</p>}
+            
             <button
               disabled={loading || !form.email || !form.password}
               onClick={loginSubmit}
-              className="w-full bg-indigo-600 text-white rounded-xl py-3 font-semibold
-                hover:bg-indigo-700 transition disabled:opacity-40 disabled:cursor-not-allowed mb-4">
-              {loading ? 'Logging in...' : 'Log In'}
+              className="w-full mc-btn py-3 mb-6 font-outfit tracking-wider disabled:opacity-50 disabled:cursor-not-allowed">
+              {loading ? 'AUTHENTICATING...' : 'INITIATE LOGIN'}
             </button>
+            
             <div className="text-center">
-              <button onClick={() => { setIsLogin(false); setError(''); }} className="text-indigo-600 text-sm font-semibold hover:underline">
-                Don't have an account? Sign up
+              <button onClick={() => { setIsLogin(false); setError(''); }} className="text-green-600 text-xs font-bold hover:text-green-700 transition-colors uppercase tracking-widest">
+                Create New Entity
               </button>
             </div>
           </>
         ) : step === 0 ? (
-          <>
+          <div className="animate-in fade-in zoom-in duration-300">
             <div className="text-center mb-8">
-              <div className="text-5xl mb-3">🎓</div>
-              <h1 className="text-2xl font-bold text-gray-900">Join Eventify</h1>
-              <p className="text-gray-500 mt-1 text-sm">How would you like to use the platform?</p>
+              <h1 className="text-4xl text-slate-800 font-vt mb-2 text-shadow-sm">Join Eventify</h1>
+              <p className="text-slate-600 text-sm font-outfit font-bold">Select your role in the ecosystem.</p>
             </div>
 
-            <div className="space-y-4 mb-6">
+            <div className="space-y-4 mb-8 font-outfit">
               <button
                 onClick={() => setStep(1)}
-                className="w-full text-left p-4 border-2 border-indigo-100 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition">
-                <div className="font-bold text-gray-900 text-lg">👩‍🎓 I'm a Student</div>
-                <div className="text-gray-500 text-sm mt-1">RSVP to events, earn MAR points, and build my portfolio.</div>
+                className="w-full text-left p-5 bg-white border-4 border-slate-300 border-b-8 hover:border-green-400 hover:bg-green-50 transition-all group relative overflow-hidden">
+                <div className="font-bold text-slate-800 text-lg relative z-10 flex items-center gap-3 font-outfit">
+                  <span className="text-green-500">⚡</span> Explorer (Student)
+                </div>
+                <div className="text-slate-500 font-medium text-xs mt-2 relative z-10 font-outfit">Discover events, earn reputation, build legacy.</div>
               </button>
 
               <button
                 onClick={() => navigate('/organizer-signup')}
-                className="w-full text-left p-4 border-2 border-purple-100 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition">
-                <div className="font-bold text-gray-900 text-lg">📋 I'm an Organizer</div>
-                <div className="text-gray-500 text-sm mt-1">Host events, manage attendees, and issue certificates.</div>
+                className="w-full text-left p-5 bg-white border-4 border-slate-300 border-b-8 hover:border-blue-400 hover:bg-blue-50 transition-all group relative overflow-hidden">
+                <div className="font-bold text-slate-800 text-lg relative z-10 flex items-center gap-3 font-outfit">
+                  <span className="text-blue-500">💠</span> Architect (Organizer)
+                </div>
+                <div className="text-slate-500 font-medium text-xs mt-2 relative z-10 font-outfit">Forge events, manage realms, issue credentials.</div>
               </button>
             </div>
 
-            <div className="text-center mt-6">
-              <button onClick={() => { setIsLogin(true); setError(''); }} className="text-indigo-600 text-sm font-semibold hover:underline">
-                Already have an account? Log In
+            <div className="text-center pt-2 border-t border-slate-300">
+              <button onClick={() => { setIsLogin(true); setError(''); }} className="text-green-600 text-xs font-bold hover:text-green-700 transition-colors uppercase tracking-widest mt-4">
+                Return to Login
               </button>
             </div>
-          </>
+          </div>
         ) : step === 1 ? (
-          <>
+          <div className="animate-in slide-in-from-right-4 duration-300">
             <div className="text-center mb-8">
-              <div className="text-5xl mb-3">⚡</div>
-              <h1 className="text-2xl font-bold text-gray-900">Student Profile</h1>
-              <p className="text-gray-500 mt-1 text-sm">Let's set up your account</p>
+              <h1 className="text-4xl text-slate-800 font-vt mb-2 text-shadow-sm">Identity Setup</h1>
+              <p className="text-slate-600 text-sm font-outfit font-bold">Configure your digital footprint.</p>
             </div>
 
-            <div className="space-y-3 mb-6">
+            <div className="space-y-4 mb-6 font-outfit">
               <input
-                className="w-full border border-gray-200 rounded-xl px-4 py-3
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
-                placeholder="Your full name"
+                className="w-full bg-white border-4 border-slate-300 rounded-none px-4 py-3 text-slate-800 focus:outline-none focus:border-green-500 transition-all text-sm placeholder-slate-400 font-bold"
+                placeholder="Designation (Name)"
                 value={form.name}
                 onChange={e => { setError(''); setForm({ ...form, name: e.target.value }) }}
               />
               <input
-                className="w-full border border-gray-200 rounded-xl px-4 py-3
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
-                placeholder="College email"
+                className="w-full bg-white border-4 border-slate-300 rounded-none px-4 py-3 text-slate-800 focus:outline-none focus:border-green-500 transition-all text-sm placeholder-slate-400 font-bold"
+                placeholder="Comm-Link (Email)"
                 type="email"
                 value={form.email}
                 onChange={e => { setError(''); setForm({ ...form, email: e.target.value }) }}
               />
               <input
-                className="w-full border border-gray-200 rounded-xl px-4 py-3
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
-                placeholder="Password"
+                className="w-full bg-white border-4 border-slate-300 rounded-none px-4 py-3 text-slate-800 focus:outline-none focus:border-green-500 transition-all text-sm placeholder-slate-400 font-bold"
+                placeholder="Security Code (Password)"
                 type="password"
                 value={form.password}
                 onChange={e => { setError(''); setForm({ ...form, password: e.target.value }) }}
               />
               <select
-                className="w-full border border-gray-200 rounded-xl px-4 py-3
-                  focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+                className="w-full bg-white border-4 border-slate-300 rounded-none px-4 py-3 text-slate-500 focus:outline-none focus:border-green-500 transition-all text-sm font-bold"
                 value={form.department}
                 onChange={e => { setError(''); setForm({ ...form, department: e.target.value }) }}>
-                <option value="">Select department</option>
-                {DEPTS.map(d => <option key={d}>{d}</option>)}
+                <option value="" className="bg-white text-slate-400">Select Faction (Department)</option>
+                {DEPTS.map(d => <option key={d} className="bg-white text-slate-700">{d}</option>)}
               </select>
             </div>
 
             <button
               disabled={!step1Valid}
               onClick={() => setStep(2)}
-              className="w-full bg-indigo-600 text-white rounded-xl py-3 font-semibold
-                hover:bg-indigo-700 transition disabled:opacity-40 disabled:cursor-not-allowed mb-4">
-              Continue →
+              className="w-full mc-btn py-3 mb-4 font-outfit tracking-wider disabled:opacity-50 disabled:cursor-not-allowed">
+              PROCEED →
             </button>
             <div className="text-center">
-              <button onClick={() => setStep(0)} className="text-gray-500 text-sm font-semibold hover:underline">
-                ← Back
+              <button onClick={() => setStep(0)} className="text-slate-500 text-xs font-bold hover:text-slate-700 uppercase tracking-widest transition-colors">
+                ← Abort
               </button>
             </div>
-          </>
+          </div>
         ) : (
-          <>
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900">What are you into?</h2>
-              <p className="text-gray-500 text-sm mt-1">Pick at least 2 — we personalise your feed</p>
+          <div className="animate-in slide-in-from-right-4 duration-300">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl text-slate-800 font-vt mb-2 text-shadow-sm">Aura Configuration</h1>
+              <p className="text-slate-600 text-sm font-outfit font-bold">Select 2+ domains to sync.</p>
             </div>
 
-            <div className="flex flex-wrap gap-2 mb-6">
-              {TAGS.map(tag => (
-                <button key={tag.id} onClick={() => toggle(tag.id)}
-                  className={`px-4 py-2 rounded-full border-2 text-sm font-medium
-                    transition-all select-none
-                    ${selected.includes(tag.id)
-                      ? tag.color + ' scale-105 shadow-sm'
-                      : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
-                  {tag.label}
-                </button>
-              ))}
+            <div className="flex flex-wrap gap-3 mb-8 justify-center font-outfit">
+              {TAGS.map(tag => {
+                const isSel = selected.includes(tag.id);
+                const colorMap = {
+                  tech: 'indigo', cultural: 'purple', sports: 'emerald', music: 'pink', career: 'amber', wellness: 'cyan', gaming: 'red'
+                };
+                const col = colorMap[tag.id] || 'indigo';
+                
+                return (
+                  <button key={tag.id} onClick={() => toggle(tag.id)}
+                    className={`px-4 py-2 border-2 border-b-4 text-xs font-bold transition-all duration-100 select-none
+                      ${isSel
+                        ? `bg-${col}-100 border-${col}-400 text-${col}-700 shadow-none translate-y-[2px] border-b-2`
+                        : 'bg-white border-slate-300 text-slate-500 hover:border-slate-400 hover:text-slate-700'}`}>
+                    {tag.label}
+                  </button>
+                )
+              })}
             </div>
 
             {error && (
-              <p className="text-red-500 text-sm mb-3 text-center">{error}</p>
+              <p className="text-red-700 font-bold text-sm mb-6 text-center font-outfit bg-red-100 py-2 border-2 border-red-300">{error}</p>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex gap-4 font-outfit">
               <button onClick={() => setStep(1)}
-                className="px-4 py-3 rounded-xl border border-gray-200 text-gray-500
-                  hover:bg-gray-50 transition text-sm">
-                ← Back
+                className="mc-btn-secondary px-5 py-3 uppercase tracking-wider flex-1">
+                BACK
               </button>
-              <button onClick={submit} disabled={loading || selected.length < 2}
-                className="flex-1 bg-indigo-600 text-white rounded-xl py-3 font-semibold
-                  hover:bg-indigo-700 transition disabled:opacity-40">
-                {loading ? 'Setting up...' : '🚀 Go to my feed'}
+              <button disabled={loading || selected.length < 2} onClick={submit}
+                className="mc-btn py-3 px-5 tracking-wider flex-[2] disabled:opacity-50 disabled:cursor-not-allowed">
+                {loading ? 'SYNCING...' : 'FINALIZE PROFILE'}
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

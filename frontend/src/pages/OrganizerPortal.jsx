@@ -142,58 +142,7 @@ export default function OrganizerPortal() {
         {/* Bottom Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
-          {/* QR CHECK-IN */}
-          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
-            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
-              <span className="text-indigo-600 text-base">📷</span> QR CHECK-IN & ATTENDANCE SCANNER
-            </h3>
-            <p className="text-[10px] text-slate-400 mt-1 mb-5">Auto-generated QR per attendee. Simulates scanning entries to mark live attendance and award points.</p>
-            
-            {/* Camera block */}
-            <div className="bg-white border-2 border-slate-100 rounded-3xl h-64 flex items-center justify-center relative overflow-hidden mb-6 shadow-inner">
-              <div className="text-center">
-                <div className="text-4xl mb-2 text-slate-300 font-mono tracking-[0.3em] font-black">O:O</div>
-                <div className="text-xs font-black tracking-[0.2em] text-emerald-500 uppercase">Simulating Web Cam</div>
-                <div className="text-4xl mt-2 text-slate-300 font-mono tracking-[0.3em] font-black">O:C</div>
-              </div>
-              {/* Green scan line */}
-              <div className="absolute left-0 right-0 h-[2px] bg-emerald-400 shadow-[0_0_12px_3px_rgba(52,211,153,0.8)] top-1/2 animate-[scan_3s_ease-in-out_infinite]"></div>
-            </div>
 
-            <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-3">Simulate Check-in Quick Actions</div>
-            <div className="space-y-2">
-              {/* Item 1 */}
-              <div className="flex justify-between items-center py-1">
-                <div className="text-xs font-bold text-slate-700">HackIndia 2026 — Build with AI</div>
-                <button className="bg-indigo-600 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition">Simulate Scan Check-in</button>
-              </div>
-              {/* Item 2 */}
-              <div className="flex justify-between items-center py-1">
-                <div className="text-xs font-bold text-slate-700">Diwali Cultural Fest</div>
-                <div className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-4 py-2 rounded-lg">✓ Checked-In</div>
-              </div>
-              {/* Item 3 */}
-              <div className="flex justify-between items-center py-1">
-                <div className="text-xs font-bold text-slate-700">GDG Cloud Study Jam</div>
-                <button className="bg-indigo-600 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition">Simulate Scan Check-in</button>
-              </div>
-              {/* Item 4 */}
-              <div className="flex justify-between items-center py-1">
-                <div className="text-xs font-bold text-slate-700">Devfolio Open Hack</div>
-                <button className="bg-indigo-600 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition">Simulate Scan Check-in</button>
-              </div>
-              {/* Item 5 */}
-              <div className="flex justify-between items-center py-1">
-                <div className="text-xs font-bold text-slate-700">AI/ML Workshop — Generative AI Fundamentals</div>
-                <button className="bg-indigo-600 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition">Simulate Scan Check-in</button>
-              </div>
-              {/* Item 6 */}
-              <div className="flex justify-between items-center py-1">
-                <div className="text-xs font-bold text-slate-700">Career Fair 2026 — Top 50 Companies</div>
-                <button className="bg-indigo-600 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition">Simulate Scan Check-in</button>
-              </div>
-            </div>
-          </div>
 
           {/* CERTIFICATE APPROVAL */}
           <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
