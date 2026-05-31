@@ -75,10 +75,16 @@ export default function Onboarding() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-3 sm:p-4 relative overflow-hidden bg-transparent">
+    <div className="min-h-screen flex items-center justify-center p-3 sm:p-4 relative overflow-hidden"
+         style={{
+           backgroundImage: "url('/theme-assets/login-bg.jpg')",
+           backgroundSize: 'cover',
+           backgroundPosition: 'center',
+           backgroundRepeat: 'no-repeat'
+         }}>
       
       {/* MAGICAL CASTLE BACKGROUND */}
-      <img src="/theme-assets/castle.png" alt="Castle" className="absolute inset-0 w-full h-full object-cover object-bottom opacity-30 z-0 pointer-events-none drop-shadow-2xl mix-blend-multiply" />
+      <img src="/theme-assets/castle.png" alt="Castle" className="absolute inset-0 w-full h-full object-cover object-bottom opacity-15 z-0 pointer-events-none drop-shadow-2xl mix-blend-multiply" />
 
       <div className="mc-panel p-5 sm:p-8 md:p-10 w-full max-w-md relative z-10 animate-float" style={{ animationDuration: '8s' }}>
 
