@@ -126,23 +126,25 @@ export default function Onboarding() {
               <p className="text-slate-600 text-sm font-outfit font-bold">Select your role in the ecosystem.</p>
             </div>
 
-            <div className="space-y-4 mb-8 font-outfit">
+            <div className="space-y-5 mb-8 font-outfit">
               <button
                 onClick={() => setStep(1)}
-                className="w-full text-left p-5 bg-white border-4 border-slate-300 border-b-8 hover:border-green-400 hover:bg-green-50 transition-all group relative overflow-hidden">
-                <div className="font-bold text-slate-800 text-lg relative z-10 flex items-center gap-3 font-outfit">
-                  <span className="text-green-500">⚡</span> Explorer (Student)
+                className="w-full text-left p-6 bg-white border-4 border-slate-800 shadow-[4px_4px_0_rgba(15,23,42,1)] hover:shadow-[8px_8px_0_rgba(34,197,94,1)] hover:-translate-y-1.5 active:translate-y-[2px] active:shadow-[2px_2px_0_rgba(34,197,94,1)] transition-all duration-300 group relative overflow-hidden">
+                <div className="absolute inset-0 bg-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="font-bold text-slate-800 text-lg relative z-10 flex items-center gap-3 font-outfit group-hover:text-green-700 transition-colors">
+                  <span className="text-xl group-hover:scale-125 transition-transform duration-300 inline-block">⚡</span> Explorer (Student)
                 </div>
-                <div className="text-slate-500 font-medium text-xs mt-2 relative z-10 font-outfit">Discover events, earn reputation, build legacy.</div>
+                <div className="text-slate-500 font-medium text-xs mt-2 relative z-10 font-outfit group-hover:text-slate-700 transition-colors">Discover events, earn reputation, build legacy.</div>
               </button>
 
               <button
                 onClick={() => navigate('/organizer-signup')}
-                className="w-full text-left p-5 bg-white border-4 border-slate-300 border-b-8 hover:border-blue-400 hover:bg-blue-50 transition-all group relative overflow-hidden">
-                <div className="font-bold text-slate-800 text-lg relative z-10 flex items-center gap-3 font-outfit">
-                  <span className="text-blue-500">💠</span> Architect (Organizer)
+                className="w-full text-left p-6 bg-white border-4 border-slate-800 shadow-[4px_4px_0_rgba(15,23,42,1)] hover:shadow-[8px_8px_0_rgba(59,130,246,1)] hover:-translate-y-1.5 active:translate-y-[2px] active:shadow-[2px_2px_0_rgba(59,130,246,1)] transition-all duration-300 group relative overflow-hidden">
+                <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="font-bold text-slate-800 text-lg relative z-10 flex items-center gap-3 font-outfit group-hover:text-blue-700 transition-colors">
+                  <span className="text-xl group-hover:scale-125 transition-transform duration-300 inline-block">💠</span> Architect (Organizer)
                 </div>
-                <div className="text-slate-500 font-medium text-xs mt-2 relative z-10 font-outfit">Forge events, manage realms, issue credentials.</div>
+                <div className="text-slate-500 font-medium text-xs mt-2 relative z-10 font-outfit group-hover:text-slate-700 transition-colors">Forge events, manage realms, issue credentials.</div>
               </button>
             </div>
 

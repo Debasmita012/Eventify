@@ -29,7 +29,7 @@ export default function Navbar() {
     <div className="sticky top-4 z-40 px-4 sm:px-6 w-full max-w-7xl mx-auto">
       <nav className="mc-panel rounded-none px-4 sm:px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <img src="/theme-assets/lantern.png" alt="Lantern" className="w-8 h-8 object-contain animate-pulse" style={{ animationDuration: '3s' }} />
+          <img src="/theme-assets/lantern.png" alt="Lantern" className="w-8 h-8 object-contain animate-pulse mix-blend-multiply" style={{ animationDuration: '3s' }} />
           <span onClick={() => navigate('/feed')}
             className="font-vt font-black text-slate-800 text-3xl cursor-pointer select-none hidden sm:block tracking-widest hover:-translate-y-1 transition-transform duration-300 text-shadow-sm">
             EVENTIFY

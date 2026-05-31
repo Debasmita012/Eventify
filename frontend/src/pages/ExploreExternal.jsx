@@ -165,7 +165,7 @@ export default function ExploreExternal() {
         <div className="absolute top-0 right-0 w-64 h-64 opacity-20 pointer-events-none mix-blend-multiply">
           <img src="/theme-assets/castle.png" alt="Castle" className="w-full h-full object-cover" />
         </div>
-        <img src="/theme-assets/chest.png" alt="Chest" className="w-24 h-24 object-contain" />
+        <img src="/theme-assets/chest.png" alt="Chest" className="w-24 h-24 object-contain mix-blend-multiply" />
         <div className="flex-1 text-center sm:text-left relative z-10">
           <h1 className="text-4xl sm:text-5xl font-vt text-slate-800 tracking-wider text-shadow-sm uppercase">
             External Events
@@ -217,7 +217,7 @@ export default function ExploreExternal() {
 
       {/* Search */}
       <div className="mc-panel p-4 mb-8 bg-blue-50 relative overflow-hidden">
-        <img src="/theme-assets/wand.png" alt="Magic" className="absolute -right-4 -bottom-4 w-24 h-24 opacity-20 pointer-events-none" />
+        <img src="/theme-assets/wand.png" alt="Magic" className="absolute -right-4 -bottom-4 w-24 h-24 opacity-20 pointer-events-none mix-blend-multiply" />
         <div className="relative w-full z-10">
           <span className="absolute left-5 top-4 text-slate-400 text-lg">✦</span>
           <input
@@ -247,7 +247,7 @@ export default function ExploreExternal() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-20 text-slate-500 font-outfit mc-panel bg-amber-50">
-          <img src="/theme-assets/chest.png" alt="Empty" className="w-24 h-24 mx-auto mb-4 opacity-50 grayscale" />
+          <img src="/theme-assets/chest.png" alt="Empty" className="w-24 h-24 mx-auto mb-4 opacity-50 grayscale mix-blend-multiply" />
           <p className="text-lg uppercase tracking-widest font-bold">The treasure vault is empty.</p>
           <p className="text-xs mt-2 text-slate-600">No events found matching your mystical search.</p>
         </div>

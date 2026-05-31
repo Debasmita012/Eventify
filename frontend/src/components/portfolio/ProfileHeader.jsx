@@ -33,22 +33,22 @@ export default function ProfileHeader({ user, totalEvents, totalCertificates, ba
       {/* Right side: Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto relative z-10 shrink-0">
         <div className="bg-white border-2 border-slate-300 border-b-4 p-4 text-center hover:bg-slate-50 transition-colors group">
-          <img src="/theme-assets/owl.png" alt="Owl" className="w-8 h-8 mx-auto mb-2 object-contain group-hover:scale-110 transition-transform" />
+          <img src="/theme-assets/owl.png" alt="Owl" className="w-8 h-8 mx-auto mb-2 object-contain group-hover:scale-110 transition-transform mix-blend-multiply" />
           <div className="text-2xl font-black text-slate-800 font-outfit">{totalEvents}</div>
           <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Events</div>
         </div>
         <div className="bg-white border-2 border-slate-300 border-b-4 p-4 text-center hover:bg-slate-50 transition-colors group">
-          <img src="/theme-assets/potion.png" alt="Potion" className="w-8 h-8 mx-auto mb-2 object-contain group-hover:scale-110 transition-transform" />
+          <img src="/theme-assets/potion.png" alt="Potion" className="w-8 h-8 mx-auto mb-2 object-contain group-hover:scale-110 transition-transform mix-blend-multiply" />
           <div className="text-2xl font-black text-slate-800 font-outfit">{totalCertificates}</div>
           <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Certs</div>
         </div>
         <div className="bg-white border-2 border-slate-300 border-b-4 p-4 text-center hover:bg-slate-50 transition-colors group">
-          <img src="/theme-assets/wand.png" alt="Wand" className="w-8 h-8 mx-auto mb-2 object-contain group-hover:scale-110 transition-transform" />
+          <img src="/theme-assets/wand.png" alt="Wand" className="w-8 h-8 mx-auto mb-2 object-contain group-hover:scale-110 transition-transform mix-blend-multiply" />
           <div className="text-2xl font-black text-slate-800 font-outfit">{badgesEarned}</div>
           <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Badges</div>
         </div>
         <div className="bg-green-50 border-2 border-green-300 border-b-4 p-4 text-center hover:bg-green-100 transition-colors group relative overflow-hidden">
-          <img src="/theme-assets/chest.png" alt="Chest" className="w-10 h-10 mx-auto mb-2 object-contain group-hover:scale-110 transition-transform relative z-10" />
+          <img src="/theme-assets/chest.png" alt="Chest" className="w-10 h-10 mx-auto mb-2 object-contain group-hover:scale-110 transition-transform relative z-10 mix-blend-multiply" />
           <div className="text-2xl font-black text-slate-800 font-outfit relative z-10">{totalPoints}</div>
           <div className="text-[10px] text-green-700 font-bold uppercase tracking-widest mt-1 relative z-10">XP</div>
         </div>

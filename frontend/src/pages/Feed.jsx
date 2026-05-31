@@ -118,9 +118,9 @@ export default function Feed() {
         {/* Greeting Banner */}
         <div className="mb-10 flex flex-col md:flex-row items-center gap-6 bg-green-50 border-4 border-green-700 p-8 relative overflow-hidden shadow-sm">
           <div className="absolute top-0 right-0 w-64 h-64 opacity-20 pointer-events-none">
-            <img src="/theme-assets/castle.png" alt="Castle" className="w-full h-full object-cover" />
+            <img src="/theme-assets/castle.png" alt="Castle" className="w-full h-full object-cover mix-blend-multiply" />
           </div>
-          <img src="/theme-assets/owl.png" alt="Owl" className="w-24 h-24 object-contain animate-bounce" style={{ animationDuration: '3s' }} />
+          <img src="/theme-assets/owl.png" alt="Owl" className="w-24 h-24 object-contain animate-bounce mix-blend-multiply" style={{ animationDuration: '3s' }} />
           <div className="text-center sm:text-left relative z-10">
             <h1 className="text-4xl sm:text-5xl font-vt mb-2 text-shadow-sm uppercase text-slate-800">
               Nexus Feed
@@ -133,7 +133,7 @@ export default function Feed() {
 
         {/* Search Panel */}
         <div className="mc-panel p-4 mb-8 flex flex-col sm:flex-row gap-4 items-center bg-blue-50 relative overflow-hidden">
-          <img src="/theme-assets/wand.png" alt="Magic" className="absolute -right-4 -bottom-4 w-32 h-32 opacity-10 pointer-events-none" />
+          <img src="/theme-assets/wand.png" alt="Magic" className="absolute -right-4 -bottom-4 w-32 h-32 opacity-10 pointer-events-none mix-blend-multiply" />
           <div className="relative w-full z-10">
             <span className="absolute left-5 top-4 text-slate-400 text-lg">✦</span>
             <input
@@ -183,7 +183,7 @@ export default function Feed() {
           </div>
         ) : events.length === 0 ? (
           <div className="text-center py-32 text-slate-500 font-outfit mc-panel bg-amber-50">
-            <img src="/theme-assets/chest.png" alt="Empty" className="w-24 h-24 mx-auto mb-4 opacity-50 grayscale" />
+            <img src="/theme-assets/chest.png" alt="Empty" className="w-24 h-24 mx-auto mb-4 opacity-50 grayscale mix-blend-multiply" />
             <p className="text-lg uppercase tracking-widest font-bold">The treasure vault is empty.</p>
             <p className="text-xs mt-2 text-slate-600">Try adjusting your magical search frequencies.</p>
           </div>

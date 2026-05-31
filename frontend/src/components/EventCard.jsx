@@ -140,7 +140,7 @@ export default function EventCard({ event, isRsvpd = false, isBookmarked = false
           ) : (
             <button onClick={handleRSVP} disabled={loadRsvp}
               className="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest transition-all mc-btn flex items-center justify-center gap-2">
-              {loadRsvp ? '...' : <><img src="/theme-assets/pickaxe.png" className="w-4 h-4" alt="Pickaxe" /> RSVP Now</>}
+              {loadRsvp ? '...' : <><img src="/theme-assets/pickaxe.png" className="w-4 h-4 mix-blend-multiply" alt="Pickaxe" /> RSVP Now</>}
             </button>
           )}
           <button onClick={handleExport}
