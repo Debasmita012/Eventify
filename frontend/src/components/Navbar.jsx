@@ -11,6 +11,7 @@ export default function Navbar() {
     { path: '/explore',      label: '🌐 Explore'  },
     { path: '/leaderboard',  label: '🏆 Board'    },
     { path: '/certificates', label: '🏅 Certs'    },
+    { path: '/graph',        label: '🕸️ Graph'    },
     { path: '/portfolio',    label: '📁 Portfolio' },
     { path: '/map',          label: '🗺 Map'       },
     ...(role === 'organizer' || role === 'admin'

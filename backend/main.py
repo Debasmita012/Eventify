@@ -24,6 +24,12 @@ from analytics import (
     compute_user_activity,
     compute_networking_matches,
 )
+from graph import (
+    find_mentors,
+    find_overlap_students,
+    recommend_clubs,
+)
+
 
 app = FastAPI()
 
@@ -1377,6 +1383,24 @@ def verify_event_meal(event_id: int, req: VerifyMealReq):
         {"$set": {"verified": True, "verified_at": datetime.now().isoformat()}}
     )
     return {"message": "Food coupon verified successfully! Serve meal. 🍲", "meal": coupon["meal"]}
+
+# ── Campus Opportunity Graph ──
+
+@app.get("/graph/{user_id}/mentors")
+def get_graph_mentors(user_id: str, q: str = Query("")):
+    db = get_db()
+    return find_mentors(user_id, db, q)
+
+@app.get("/graph/{user_id}/overlap")
+def get_graph_overlap(user_id: str):
+    db = get_db()
+    return find_overlap_students(user_id, db)
+
+@app.get("/graph/{user_id}/clubs")
+def get_graph_clubs(user_id: str):
+    db = get_db()
+    return recommend_clubs(user_id, db)
+
 
 
 

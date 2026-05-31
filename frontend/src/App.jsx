@@ -13,6 +13,7 @@ import MapView from './pages/MapView'
 import ExploreExternal from './pages/ExploreExternal'
 import CertificateVault from './pages/CertificateVault'
 import AdminPanel from './pages/AdminPanel'
+import OpportunityGraph from './pages/OpportunityGraph'
 import Navbar from './components/Navbar'
 
 function RequireAuth({ children }) {
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="/map" element={<RequireAuth><Layout><MapView /></Layout></RequireAuth>} />
         <Route path="/explore" element={<RequireAuth><Layout><ExploreExternal /></Layout></RequireAuth>} />
         <Route path="/certificates" element={<RequireAuth><Layout><CertificateVault /></Layout></RequireAuth>} />
+        <Route path="/graph" element={<RequireAuth><Layout><OpportunityGraph /></Layout></RequireAuth>} />
         <Route path="/admin" element={<RequireAuth><Layout><AdminPanel /></Layout></RequireAuth>} />
       </Routes>
     </BrowserRouter>
