@@ -82,11 +82,13 @@ export default function Onboarding() {
            backgroundPosition: 'center',
            backgroundRepeat: 'no-repeat'
          }}>
-      
-      {/* MAGICAL CASTLE BACKGROUND */}
-      <img src="/theme-assets/castle.png" alt="Castle" className="absolute inset-0 w-full h-full object-cover object-bottom opacity-15 z-0 pointer-events-none drop-shadow-2xl mix-blend-multiply" />
 
       <div className="mc-panel p-5 sm:p-8 md:p-10 w-full max-w-md relative z-10 animate-float" style={{ animationDuration: '8s' }}>
+        
+        {/* Brand Logo */}
+        <div className="flex justify-center mb-6">
+          <img src="/theme-assets/logo.png" alt="Eventify Logo" className="w-52 object-contain transition-transform duration-300 hover:scale-105" />
+        </div>
 
         {isLogin ? (
           <>
