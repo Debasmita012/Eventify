@@ -1080,7 +1080,13 @@ def get_event_quizzes(event_id: int):
 @app.post("/events/{event_id}/quiz")
 def create_event_quiz(event_id: int, req: QuizCreate):
     db = get_db()
-    user = db.users.find_one({"id": req.organizer_id})
+    # Handle int conversion safely for user lookup
+    try:
+        org_id = int(req.organizer_id)
+    except ValueError:
+        org_id = req.organizer_id
+
+    user = db.users.find_one({"id": org_id})
     if not user or user.get("role") not in ("organizer", "admin"):
         raise HTTPException(403, "Only organizers can create quizzes")
         
@@ -1155,7 +1161,11 @@ def get_quiz_leaderboard(event_id: int):
     results = list(db.quiz_submissions.aggregate(pipeline))
     leaderboard = []
     for idx, r in enumerate(results):
-        user = db.users.find_one({"id": r["_id"]}, {"name": 1, "department": 1, "_id": 0})
+        try:
+            uid = int(r["_id"])
+        except ValueError:
+            uid = r["_id"]
+        user = db.users.find_one({"id": uid}, {"name": 1, "department": 1, "_id": 0})
         leaderboard.append({
             "rank": idx + 1,
             "name": user.get("name", "Student") if user else "Student",

@@ -1213,7 +1213,7 @@ export default function EventDetail() {
               {/* ── ALL-IN-ONE QUIZ ARENA INTEGRATION ── */}
               <div className="mc-panel bg-white border border-slate-300 p-6 rounded-3xl space-y-4" id="quiz-arena-section">
                 <div className="flex justify-between items-center">
-                  <h3 className="font-black text-slate-900 text-sm flex items-center gap-2">
+                  <h3 className="font-black text-slate-900 text-lg flex items-center gap-2">
                     <span>📝</span> Live Quiz Arena
                   </h3>
                   
@@ -1221,7 +1221,7 @@ export default function EventDetail() {
                     <select
                       value={activeQuizId || ''}
                       onChange={e => selectQuiz(e.target.value)}
-                      className="mc-panel bg-white border-4 border-slate-200 border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-700 focus:outline-none"
+                      className="mc-panel bg-white border-4 border-slate-200 border border-slate-300 rounded-xl px-4 py-2 text-base font-bold text-slate-800 focus:outline-none"
                     >
                       {quizzes.map((q, idx) => (
                         <option key={q.id} value={q.id}>Quiz {idx + 1}</option>
@@ -1231,7 +1231,7 @@ export default function EventDetail() {
                 </div>
 
                 {quizzes.length === 0 ? (
-                  <div className="text-center py-8 text-slate-500 text-xs italic mc-panel bg-white border-4 border-slate-200/30 rounded-2xl border border-slate-300">
+                  <div className="text-center py-12 text-slate-600 text-base font-semibold italic mc-panel bg-white border-4 border-slate-200/30 rounded-2xl border border-slate-300">
                     No active quizzes running for this event currently.
                   </div>
                 ) : (
@@ -1239,17 +1239,17 @@ export default function EventDetail() {
                     const currentQuiz = quizzes.find(q => q.id === activeQuizId) || quizzes[0]
                     const attempted = quizSubmissions.includes(currentQuiz.id)
                     return (
-                      <div className="mc-panel bg-white border-4 border-slate-200 border border-slate-300 p-5 rounded-2xl space-y-4">
-                        <div className="flex justify-between items-center text-[10px] font-bold text-slate-600">
+                      <div className="mc-panel bg-white border-4 border-slate-200 border border-slate-300 p-6 rounded-2xl space-y-5">
+                        <div className="flex justify-between items-center text-xs font-black tracking-wider text-slate-500">
                           <span>QUESTION CHALLENGE</span>
-                          <span className="text-amber-700">+{currentQuiz.points || 50} XP</span>
+                          <span className="text-amber-700 bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/30">+{currentQuiz.points || 50} XP</span>
                         </div>
 
-                        <h4 className="font-bold text-slate-800 text-sm leading-relaxed">
+                        <h4 className="font-black text-slate-900 text-xl leading-relaxed">
                           {currentQuiz.question}
                         </h4>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                           {currentQuiz.options.map((opt, oIdx) => {
                             const optChar = ['A', 'B', 'C', 'D'][oIdx]
                             return (
@@ -1257,15 +1257,15 @@ export default function EventDetail() {
                                 key={oIdx}
                                 onClick={() => setSelectedQuizOption(optChar)}
                                 disabled={attempted}
-                                className={`w-full text-left rounded-xl px-4 py-3 text-xs font-semibold border transition ${
+                                className={`w-full text-left rounded-xl px-5 py-4 text-base font-bold border-2 transition shadow-sm ${
                                   selectedQuizOption === optChar
-                                    ? 'border-indigo-500 bg-indigo-500/10 text-slate-900'
+                                    ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-indigo-500/20'
                                     : attempted
-                                      ? 'border-slate-300 mc-panel bg-white border-4 border-slate-200 text-slate-600 cursor-not-allowed'
-                                      : 'border-slate-850 mc-panel bg-white hover:border-slate-700 text-slate-700'
+                                      ? 'border-slate-300 mc-panel bg-slate-50 text-slate-500 cursor-not-allowed opacity-75'
+                                      : 'border-slate-200 mc-panel bg-white hover:border-slate-400 text-slate-800 hover:shadow-md'
                                 }`}
                               >
-                                <span className="text-indigo-400 mr-2">{optChar}.</span> {opt}
+                                <span className="text-indigo-500 font-black mr-3">{optChar}.</span> {opt}
                               </button>
                             )
                           })}
@@ -1274,12 +1274,12 @@ export default function EventDetail() {
                         {!attempted ? (
                           <button
                             onClick={() => handleAttemptQuiz(currentQuiz.id)}
-                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-slate-900 font-bold text-xs py-2.5 rounded-xl transition"
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 font-black text-base py-4 rounded-xl transition mt-4"
                           >
                             Submit Quiz Answer
                           </button>
                         ) : (
-                          <div className="text-center text-xs text-slate-500 font-bold mc-panel bg-white/50 py-2 rounded-xl">
+                          <div className="text-center text-sm text-emerald-700 font-black mc-panel bg-emerald-50 border-2 border-emerald-500/20 py-4 rounded-xl mt-4">
                             ✓ Answer submitted! Verify Leaderboard points.
                           </div>
                         )}
