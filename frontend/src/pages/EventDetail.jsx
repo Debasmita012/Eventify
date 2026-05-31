@@ -781,18 +781,18 @@ export default function EventDetail() {
       
       {/* Organizer View Toggle */}
       {(userRole === 'organizer' || userRole === 'admin') && (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 bg-slate-900 p-2 rounded-2xl shadow-2xl border border-slate-800">
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-row sm:flex-col gap-1.5 bg-slate-900 p-1.5 rounded-2xl shadow-2xl border border-slate-800">
           <button 
             onClick={() => setViewMode('public')}
-            className={`px-4 py-2 rounded-xl font-bold text-sm transition ${viewMode === 'public' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
+            className={`px-3 py-2 rounded-xl font-bold text-xs sm:text-sm transition ${viewMode === 'public' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
           >
-            👀 Student View
+            👀 <span className="hidden sm:inline">Student </span>View
           </button>
           <button 
             onClick={() => setViewMode('organizer')}
-            className={`px-4 py-2 rounded-xl font-bold text-sm transition ${viewMode === 'organizer' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
+            className={`px-3 py-2 rounded-xl font-bold text-xs sm:text-sm transition ${viewMode === 'organizer' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}
           >
-            🛠️ Organizer View
+            🛠️ <span className="hidden sm:inline">Organizer </span>View
           </button>
         </div>
       )}
@@ -802,18 +802,18 @@ export default function EventDetail() {
       <div className="absolute bottom-[20%] right-[-10%] w-96 h-96 bg-purple-500/10 rounded-full blur-[100px]" />
 
       {/* ── SCREENSHOT 1 STYLED HEADER NAVBAR ───────────────────────────────── */}
-      <header className="relative z-30 bg-white border-4 border-slate-300 px-6 py-4 mt-8 flex flex-col lg:flex-row lg:items-center justify-between gap-4 mc-panel shadow-sm mx-4 lg:mx-0">
+      <header className="relative z-30 bg-white border-4 border-slate-300 px-4 sm:px-6 py-3 sm:py-4 mt-4 sm:mt-8 flex flex-col lg:flex-row lg:items-center justify-between gap-3 mc-panel shadow-sm mx-2 sm:mx-4 lg:mx-0">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-green-500 border-2 border-b-4 border-green-700 flex items-center justify-center font-black text-2xl text-white shadow-sm">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 border-2 border-b-4 border-green-700 flex items-center justify-center font-black text-xl sm:text-2xl text-white shadow-sm shrink-0">
             {ET_ICONS[event.event_type] || '📌'}
           </div>
-          <div>
-            <div className="font-vt font-black text-slate-800 text-3xl leading-tight tracking-widest uppercase text-shadow-sm">{event.title}</div>
+          <div className="min-w-0">
+            <div className="font-vt font-black text-slate-800 text-xl sm:text-3xl leading-tight tracking-widest uppercase text-shadow-sm truncate">{event.title}</div>
             <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest font-outfit">{event.category} - Operating System</div>
           </div>
         </div>
 
-        {/* Horizontal Navigation List (Screenshot 1: About, Problems, Events, Timeline...) */}
+        {/* Horizontal Navigation List - hidden on mobile */}
         <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-500">
           <button onClick={() => document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-green-600 transition">About</button>
           
@@ -840,7 +840,7 @@ export default function EventDetail() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowAIAssistant(!showAIAssistant)}
-            className="bg-indigo-600/90 hover:bg-indigo-600 text-white font-bold text-xs px-3.5 py-2 rounded-full transition flex items-center gap-1 shadow-lg shadow-indigo-500/10 border border-indigo-400/20"
+            className="bg-indigo-600/90 hover:bg-indigo-600 text-white font-bold text-xs px-3 sm:px-3.5 py-2 rounded-full transition flex items-center gap-1 shadow-lg shadow-indigo-500/10 border border-indigo-400/20"
           >
             <span>🤖</span> AI Assist
           </button>
@@ -879,15 +879,15 @@ export default function EventDetail() {
         
 
         {/* ── TAB PORTALS ─────────────────────────────────────────────────── */}
-        <div className="p-2 md:p-6">
+        <div className="p-2 sm:p-4 md:p-6">
 
           {/* 1. OVERVIEW TAB (Screenshot 2 / 3 details: description, venue highlight, rules, Accordion FAQs) */}
           <div id="about-section" className="py-20 max-w-7xl mx-auto scroll-mt-24">
             <div className="space-y-8">
               
               {/* About Section Header - Title ONLY, NO IMAGE */}
-              <div className="relative flex items-center justify-center w-full max-w-4xl mx-auto mb-8">
-                <h2 className="text-4xl md:text-6xl font-vt font-black text-slate-900 text-shadow-sm uppercase text-center">
+              <div className="relative flex items-center justify-center w-full max-w-4xl mx-auto mb-6 sm:mb-8 px-4">
+                <h2 className="text-3xl sm:text-4xl md:text-6xl font-vt font-black text-slate-900 text-shadow-sm uppercase text-center break-words">
                   {event.title}
                 </h2>
               </div>
@@ -1833,6 +1833,39 @@ export default function EventDetail() {
       )}
 
 
+      {/* ── MOBILE BOTTOM NAV (visible only on small screens) ── */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t-4 border-slate-300 flex items-center justify-around px-2 py-2 shadow-2xl">
+        <button onClick={() => document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth' })}
+          className="flex flex-col items-center gap-0.5 text-slate-500 hover:text-green-600 transition min-w-[48px]">
+          <span className="text-lg">📋</span>
+          <span className="text-[9px] font-bold uppercase">About</span>
+        </button>
+        <button onClick={() => document.getElementById('prizes-section')?.scrollIntoView({ behavior: 'smooth' })}
+          className="flex flex-col items-center gap-0.5 text-slate-500 hover:text-amber-600 transition min-w-[48px]">
+          <span className="text-lg">🏆</span>
+          <span className="text-[9px] font-bold uppercase">Prizes</span>
+        </button>
+        <button onClick={() => document.getElementById('schedule-section')?.scrollIntoView({ behavior: 'smooth' })}
+          className="flex flex-col items-center gap-0.5 text-slate-500 hover:text-blue-600 transition min-w-[48px]">
+          <span className="text-lg">📅</span>
+          <span className="text-[9px] font-bold uppercase">Schedule</span>
+        </button>
+        <button onClick={() => document.getElementById('dashboard-section')?.scrollIntoView({ behavior: 'smooth' })}
+          className="flex flex-col items-center gap-0.5 text-slate-500 hover:text-indigo-600 transition min-w-[48px]">
+          <span className="text-lg">⚡</span>
+          <span className="text-[9px] font-bold uppercase">Dashboard</span>
+        </button>
+        <button onClick={() => document.getElementById('food-section')?.scrollIntoView({ behavior: 'smooth' })}
+          className="flex flex-col items-center gap-0.5 text-slate-500 hover:text-orange-600 transition min-w-[48px]">
+          <span className="text-lg">🍲</span>
+          <span className="text-[9px] font-bold uppercase">Food</span>
+        </button>
+        <button onClick={() => document.getElementById('helpdesk-section')?.scrollIntoView({ behavior: 'smooth' })}
+          className="flex flex-col items-center gap-0.5 text-slate-500 hover:text-red-600 transition min-w-[48px]">
+          <span className="text-lg">🆘</span>
+          <span className="text-[9px] font-bold uppercase">Help</span>
+        </button>
+      </nav>
 
       {/* Dynamic Confetti celebration */}
       {showConfetti && (

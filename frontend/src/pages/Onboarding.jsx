@@ -75,17 +75,17 @@ export default function Onboarding() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-transparent">
+    <div className="min-h-screen flex items-center justify-center p-3 sm:p-4 relative overflow-hidden bg-transparent">
       
       {/* MAGICAL CASTLE BACKGROUND */}
       <img src="/theme-assets/castle.png" alt="Castle" className="absolute inset-0 w-full h-full object-cover object-bottom opacity-30 z-0 pointer-events-none drop-shadow-2xl mix-blend-multiply" />
 
-      <div className="mc-panel p-10 w-full max-w-md relative z-10 animate-float" style={{ animationDuration: '8s' }}>
+      <div className="mc-panel p-5 sm:p-8 md:p-10 w-full max-w-md relative z-10 animate-float" style={{ animationDuration: '8s' }}>
 
         {isLogin ? (
           <>
-            <div className="text-center mb-8">
-              <h1 className="text-4xl text-slate-800 font-vt mb-2 text-shadow-sm">Welcome Back</h1>
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="text-3xl sm:text-4xl text-slate-800 font-vt mb-2 text-shadow-sm">Welcome Back</h1>
               <p className="text-slate-600 text-sm font-outfit font-bold">Authenticate to enter the nexus.</p>
             </div>
             <div className="space-y-4 mb-6 font-outfit">
@@ -121,8 +121,8 @@ export default function Onboarding() {
           </>
         ) : step === 0 ? (
           <div className="animate-in fade-in zoom-in duration-300">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl text-slate-800 font-vt mb-2 text-shadow-sm">Join Eventify</h1>
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="text-3xl sm:text-4xl text-slate-800 font-vt mb-2 text-shadow-sm">Join Eventify</h1>
               <p className="text-slate-600 text-sm font-outfit font-bold">Select your role in the ecosystem.</p>
             </div>
 
@@ -154,8 +154,8 @@ export default function Onboarding() {
           </div>
         ) : step === 1 ? (
           <div className="animate-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl text-slate-800 font-vt mb-2 text-shadow-sm">Identity Setup</h1>
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="text-3xl sm:text-4xl text-slate-800 font-vt mb-2 text-shadow-sm">Identity Setup</h1>
               <p className="text-slate-600 text-sm font-outfit font-bold">Configure your digital footprint.</p>
             </div>
 
@@ -203,8 +203,8 @@ export default function Onboarding() {
           </div>
         ) : (
           <div className="animate-in slide-in-from-right-4 duration-300">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl text-slate-800 font-vt mb-2 text-shadow-sm">Aura Configuration</h1>
+            <div className="text-center mb-5 sm:mb-8">
+              <h1 className="text-3xl sm:text-4xl text-slate-800 font-vt mb-2 text-shadow-sm">Aura Configuration</h1>
               <p className="text-slate-600 text-sm font-outfit font-bold">Select 2+ domains to sync.</p>
             </div>
 
@@ -218,7 +218,7 @@ export default function Onboarding() {
                 
                 return (
                   <button key={tag.id} onClick={() => toggle(tag.id)}
-                    className={`px-4 py-2 border-2 border-b-4 text-xs font-bold transition-all duration-100 select-none
+                    className={`px-4 py-2.5 border-2 border-b-4 text-sm font-bold transition-all duration-100 select-none min-h-[44px]
                       ${isSel
                         ? `bg-${col}-100 border-${col}-400 text-${col}-700 shadow-none translate-y-[2px] border-b-2`
                         : 'bg-white border-slate-300 text-slate-500 hover:border-slate-400 hover:text-slate-700'}`}>
